@@ -52,14 +52,16 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     // ---------------------------------------------------------------------------
 
     private fun resolveUri(uri: Uri): String {
-        return when (uri.scheme) {
-            "content" -> {
-                val fd = context.contentResolver
-                    .openFileDescriptor(uri, "r") ?: return uri.toString()
-                "fd://${fd.detachFd()}"
-            }
-            "file" -> uri.path ?: uri.toString()
-            else -> uri.toString()
+        if (uri.scheme != "content") {
+            return uri.path ?: uri.toString()
+        }
+        return try {
+            val pfd = context.contentResolver.openFileDescriptor(uri, "r")
+                ?: return uri.toString()
+            val fd = pfd.detachFd()
+            "fd://$fd"
+        } catch (e: Exception) {
+            uri.toString()
         }
     }
 
