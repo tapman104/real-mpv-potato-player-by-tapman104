@@ -12,8 +12,8 @@ object MpvPropertyObserver {
         
         // Observe track structures
         MPVLib.observeProperty(MpvConstants.PROP_TRACK_LIST, MpvConstants.MPV_FORMAT_NODE)
-        MPVLib.observeProperty(MpvConstants.PROP_AUDIO_ID, MpvConstants.MPV_FORMAT_STRING)
-        MPVLib.observeProperty(MpvConstants.PROP_SUBTITLE_ID, MpvConstants.MPV_FORMAT_STRING)
+        MPVLib.observeProperty(MpvConstants.PROP_AUDIO_ID, MpvConstants.MPV_FORMAT_INT64)
+        MPVLib.observeProperty(MpvConstants.PROP_SUBTITLE_ID, MpvConstants.MPV_FORMAT_INT64)
         
         // Observe playback parameters
         MPVLib.observeProperty(MpvConstants.PROP_SPEED, MpvConstants.MPV_FORMAT_DOUBLE)

@@ -245,11 +245,11 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
                 _playerState.update { it.copy(audioTracks = audioTracks, subtitleTracks = subtitleTracks) }
             }
             MpvConstants.PROP_AUDIO_ID -> {
-                val id = (value as? String)?.toIntOrNull() ?: -1
+                val id = (value as? Long)?.toInt() ?: -1
                 _playerState.update { it.copy(selectedAudioTrackId = id) }
             }
             MpvConstants.PROP_SUBTITLE_ID -> {
-                val id = (value as? String)?.toIntOrNull() ?: -1
+                val id = (value as? Long)?.toInt() ?: -1
                 _playerState.update { it.copy(selectedSubtitleTrackId = id) }
             }
             MpvConstants.PROP_SPEED -> {
