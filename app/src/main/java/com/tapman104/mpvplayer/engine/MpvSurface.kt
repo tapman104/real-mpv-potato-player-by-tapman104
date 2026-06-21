@@ -24,7 +24,7 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         Log.d(TAG, "surfaceChanged: width=$width, height=$height")
         val surface = holder.surface
-        if (surface != null && surface.isValid) {
+        if (surface != null && surface.isValid && surface != attachedSurface) {
             attachedSurface = surface
             executor.execute {
                 MPVLib.attachSurface(surface)

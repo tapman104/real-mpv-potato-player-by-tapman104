@@ -54,9 +54,9 @@ class MpvController(private val context: Context) {
         if (!initialized) return
         Log.d(TAG, "Destroying MPV engine")
         initialized = false
-        
+
         surface.detachForce()
-        
+
         executor.execute {
             try {
                 MPVLib.removeObserver(dispatcher)
@@ -64,9 +64,10 @@ class MpvController(private val context: Context) {
                 Log.d(TAG, "MPV engine destroyed successfully")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to destroy MPV engine", e)
-            } finally {
-                executor.shutdown()
             }
         }
+
+        // Shutdown AFTER submitting the cleanup task, not inside it
+        executor.shutdown()
     }
 }
