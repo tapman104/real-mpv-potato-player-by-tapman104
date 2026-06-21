@@ -60,6 +60,10 @@ fun PlayerScreen(
     ) {
         AndroidView(
             factory = { surfaceView },
+            // update is called on every recomposition — keeping the SurfaceView
+            // reference alive prevents Compose from recycling/destroying the
+            // SurfaceHolder that mpv renders into (which causes a black screen).
+            update = { /* intentional no-op: reuse existing SurfaceView */ },
             modifier = Modifier
                 .fillMaxSize()
                 .clickable(

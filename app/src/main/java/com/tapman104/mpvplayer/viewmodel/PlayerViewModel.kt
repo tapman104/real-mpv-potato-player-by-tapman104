@@ -60,6 +60,20 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
         } catch (e: SecurityException) {
             // Permission may already be held or not grantable; proceed anyway
         }
+        // Update playlist state so currentUri reflects the new file immediately.
+        // If the URI is already in the list, jump to it; otherwise append and jump.
+        _playlistState.update { current ->
+            val uriStr = uri.toString()
+            val existingIndex = current.items.indexOf(uriStr)
+            if (existingIndex >= 0) {
+                current.copy(currentIndex = existingIndex)
+            } else {
+                current.copy(
+                    items = current.items + uriStr,
+                    currentIndex = current.items.size
+                )
+            }
+        }
         _playerState.update { it.copy(isLoading = true, error = null) }
         controller.executor.loadFile(uri.toString())
     }
