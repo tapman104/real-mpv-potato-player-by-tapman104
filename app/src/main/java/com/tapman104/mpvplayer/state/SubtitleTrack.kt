@@ -1,0 +1,8 @@
+package com.tapman104.mpvplayer.state
+
+data class SubtitleTrack(
+    val id: Int,
+    val title: String,
+    val lang: String,
+    val isSelected: Boolean
+)
