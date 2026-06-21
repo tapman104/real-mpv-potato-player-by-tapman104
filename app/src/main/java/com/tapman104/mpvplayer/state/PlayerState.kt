@@ -4,7 +4,8 @@ data class PlayerState(
     val isPlaying: Boolean = false,
     val currentPositionMs: Long = 0L,
     val durationMs: Long = 0L,
-    val bufferedPositionMs: Long = 0L,
+    // How far ahead is cached (from demuxer-cache-time), NOT a buffer byte position.
+    val demuxerCacheTimeMs: Long = 0L,
     val audioTracks: List<AudioTrack> = emptyList(),
     val subtitleTracks: List<SubtitleTrack> = emptyList(),
     val selectedAudioTrackId: Int = -1,

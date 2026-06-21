@@ -165,8 +165,12 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
 
     fun setSubtitleBackgroundAlpha(alpha: Float) {
         _subtitleAppearance.update { it.copy(backgroundAlpha = alpha) }
+        // sub-back-color expects an ASS ARGB color string "#AARRggBB".
+        // We keep RGB as black (000000) and only vary the alpha channel.
+        val alphaInt = (alpha * 255).toInt().coerceIn(0, 255)
+        val color = String.format("#%02X000000", alphaInt)
         controller.executor.execute {
-            MPVLib.setPropertyDouble("sub-back-color", alpha.toDouble())
+            MPVLib.setPropertyString("sub-back-color", color)
         }
     }
 
@@ -206,7 +210,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
             }
             MpvConstants.PROP_DEMUXER_CACHE_TIME -> {
                 val seconds = value as? Double ?: return
-                _playerState.update { it.copy(bufferedPositionMs = (seconds * 1000).toLong()) }
+                _playerState.update { it.copy(demuxerCacheTimeMs = (seconds * 1000).toLong()) }
             }
             MpvConstants.PROP_TRACK_LIST -> {
                 val node = value as? MPVNode ?: return
