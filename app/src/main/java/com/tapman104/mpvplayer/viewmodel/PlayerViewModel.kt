@@ -51,6 +51,18 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     // Load / URI
     // ---------------------------------------------------------------------------
 
+    private fun resolveUri(uri: Uri): String {
+        return when (uri.scheme) {
+            "content" -> {
+                val fd = context.contentResolver
+                    .openFileDescriptor(uri, "r") ?: return uri.toString()
+                "fd://${fd.detachFd()}"
+            }
+            "file" -> uri.path ?: uri.toString()
+            else -> uri.toString()
+        }
+    }
+
     fun loadAndPlay(uri: Uri) {
         try {
             context.contentResolver.takePersistableUriPermission(
@@ -75,7 +87,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
             }
         }
         _playerState.update { it.copy(isLoading = true, error = null) }
-        controller.executor.loadFile(uri.toString())
+        controller.executor.loadFile(resolveUri(uri))
     }
 
     // ---------------------------------------------------------------------------
