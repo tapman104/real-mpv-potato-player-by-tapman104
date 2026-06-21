@@ -19,8 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.tapman104.mpvplayer.state.AudioTrack
 import com.tapman104.mpvplayer.state.PlayerState
 import com.tapman104.mpvplayer.state.PlaylistState
+import com.tapman104.mpvplayer.state.SubtitleTrack
 import com.tapman104.mpvplayer.ui.components.PlayerTopBar
 import com.tapman104.mpvplayer.ui.components.PlayerBottomBar
 import kotlinx.coroutines.delay
@@ -33,6 +35,8 @@ fun PlayerScreen(
     onTogglePlay: () -> Unit,
     onSeek: (Long) -> Unit,
     onOpenFile: () -> Unit,
+    onSelectAudioTrack: (Int) -> Unit,
+    onSelectSubtitleTrack: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
@@ -72,7 +76,13 @@ fun PlayerScreen(
         ) {
             PlayerTopBar(
                 fileName = fileName,
-                onOpenFile = onOpenFile
+                onOpenFile = onOpenFile,
+                audioTracks = playerState.audioTracks,
+                selectedAudioTrackId = playerState.selectedAudioTrackId,
+                subtitleTracks = playerState.subtitleTracks,
+                selectedSubtitleTrackId = playerState.selectedSubtitleTrackId,
+                onSelectAudioTrack = onSelectAudioTrack,
+                onSelectSubtitleTrack = onSelectSubtitleTrack
             )
         }
 

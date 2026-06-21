@@ -61,7 +61,9 @@ class PlayerActivity : ComponentActivity() {
                     surfaceView = surfaceView,
                     onTogglePlay = { viewModel.togglePlay() },
                     onSeek = { viewModel.seekTo(it) },
-                    onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) }
+                    onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) },
+                    onSelectAudioTrack = { viewModel.setAudioTrack(it) },
+                    onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) }
                 )
             }
         }
