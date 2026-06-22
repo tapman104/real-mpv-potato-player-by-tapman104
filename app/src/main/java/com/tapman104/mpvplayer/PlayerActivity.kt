@@ -81,6 +81,7 @@ class PlayerActivity : ComponentActivity() {
                     onTogglePlay = { viewModel.togglePlay() },
                     onSeek = { viewModel.seekTo(it) },
                     onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) },
+                    onSpeedChange = { viewModel.setSpeed(it) },
                     onSelectAudioTrack = { viewModel.setAudioTrack(it) },
                     onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) },
                     onSubtitleAppearance = { size, position -> viewModel.setSubtitleAppearance(size, position) },

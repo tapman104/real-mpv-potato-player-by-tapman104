@@ -5,7 +5,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Audiotrack
 import androidx.compose.material.icons.filled.ClosedCaption
-import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import com.tapman104.mpvplayer.state.AudioTrack
 import com.tapman104.mpvplayer.state.SubtitleTrack
 import com.tapman104.mpvplayer.ui.dialogs.AudioTrackDialog
+import com.tapman104.mpvplayer.ui.dialogs.MoreOptionsDialog
+import com.tapman104.mpvplayer.ui.dialogs.PlaybackSpeedDialog
 import com.tapman104.mpvplayer.ui.dialogs.SubtitleTrackDialog
 
 
@@ -33,6 +34,7 @@ fun PlayerTopBar(
     speed: Float,
     onBack: () -> Unit,
     onOpenFile: () -> Unit,
+    onSpeedChange: (Float) -> Unit,
     audioTracks: List<AudioTrack>,
     selectedAudioTrackId: Int,
     subtitleTracks: List<SubtitleTrack>,
@@ -43,6 +45,8 @@ fun PlayerTopBar(
 ) {
     var showAudioDialog by remember { mutableStateOf(false) }
     var showSubtitleDialog by remember { mutableStateOf(false) }
+    var showMoreOptionsDialog by remember { mutableStateOf(false) }
+    var showSpeedDialog by remember { mutableStateOf(false) }
 
     if (showAudioDialog) {
         AudioTrackDialog(
@@ -61,6 +65,24 @@ fun PlayerTopBar(
             onDisableSubtitles = { onSelectSubtitleTrack(-1) },
             onDismiss = { showSubtitleDialog = false },
             onAppearanceClick = { showSubtitleDialog = false }
+        )
+    }
+
+    if (showMoreOptionsDialog) {
+        MoreOptionsDialog(
+            onOpenFile = { onOpenFile(); showMoreOptionsDialog = false },
+            onPlaybackSpeed = { showMoreOptionsDialog = false; showSpeedDialog = true },
+            onLoopRepeat = { showMoreOptionsDialog = false },
+            onAspectRatio = { showMoreOptionsDialog = false },
+            onDismiss = { showMoreOptionsDialog = false }
+        )
+    }
+
+    if (showSpeedDialog) {
+        PlaybackSpeedDialog(
+            currentSpeed = speed,
+            onSelectSpeed = { onSpeedChange(it); showSpeedDialog = false },
+            onDismiss = { showSpeedDialog = false }
         )
     }
 
@@ -128,18 +150,7 @@ fun PlayerTopBar(
             )
         }
         IconButton(
-            onClick = onOpenFile,
-            modifier = Modifier.size(36.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.FolderOpen,
-                contentDescription = "Open file",
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        IconButton(
-            onClick = {},
+            onClick = { showMoreOptionsDialog = true },
             modifier = Modifier.size(36.dp)
         ) {
             Icon(
