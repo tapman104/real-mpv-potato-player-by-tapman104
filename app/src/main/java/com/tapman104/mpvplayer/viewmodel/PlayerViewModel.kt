@@ -308,7 +308,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     override fun onPlaybackStopped(endReason: Int) {
         _playerState.update { it.copy(isPlaying = false) }
         // MPV_END_FILE_REASON_ERROR = 4. If the surface is also gone, the VO crashed on lock.
-        if (endReason == 4 && !controller.surface.hasSurface() && lastPlayedUri != null) {
+        if ((endReason == 0 || endReason == 4) && !controller.surface.hasSurface() && lastPlayedUri != null) {
             Log.d(TAG, "VO fatal error while surface is gone — flagging for recovery on next surfaceCreated")
             surfaceWasLost = true
         }
