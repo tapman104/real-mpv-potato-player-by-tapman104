@@ -216,6 +216,12 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
         }
     }
 
+    fun setSubtitleAppearance(size: Float, position: Float) {
+        _playerState.update { it.copy(subtitleSize = size, subtitlePosition = position) }
+        controller.executor.setSubtitleAppearance(size, position)
+    }
+
+
     // ---------------------------------------------------------------------------
     // MpvEventListener
     // ---------------------------------------------------------------------------

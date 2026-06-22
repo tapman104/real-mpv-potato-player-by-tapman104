@@ -14,5 +14,7 @@ data class PlayerState(
     val volume: Int = 100,
     val decodeMode: DecodeMode = DecodeMode.HWPlus,
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val subtitleSize: Float = 1.0f,
+    val subtitlePosition: Float = 0.12f,
 )

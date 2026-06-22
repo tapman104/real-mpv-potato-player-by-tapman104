@@ -83,6 +83,13 @@ class MpvCommandExecutor {
         }
     }
 
+    fun setSubtitleAppearance(size: Float, position: Float) {
+        execute {
+            MPVLib.setPropertyDouble("sub-scale", size.toDouble())
+            MPVLib.setPropertyDouble("sub-pos", (100.0 - (position * 100.0)))
+        }
+    }
+
     fun shutdown() {
         executor.shutdown()
     }

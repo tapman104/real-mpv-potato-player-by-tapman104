@@ -37,6 +37,7 @@ fun PlayerScreen(
     onOpenFile: () -> Unit,
     onSelectAudioTrack: (Int) -> Unit,
     onSelectSubtitleTrack: (Int) -> Unit,
+    onSubtitleAppearance: (size: Float, position: Float) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
@@ -86,7 +87,10 @@ fun PlayerScreen(
                 subtitleTracks = playerState.subtitleTracks,
                 selectedSubtitleTrackId = playerState.selectedSubtitleTrackId,
                 onSelectAudioTrack = onSelectAudioTrack,
-                onSelectSubtitleTrack = onSelectSubtitleTrack
+                onSelectSubtitleTrack = onSelectSubtitleTrack,
+                subtitleSize = playerState.subtitleSize,
+                subtitlePosition = playerState.subtitlePosition,
+                onSubtitleAppearance = onSubtitleAppearance,
             )
         }
 

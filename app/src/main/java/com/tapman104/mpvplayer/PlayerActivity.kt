@@ -63,7 +63,8 @@ class PlayerActivity : ComponentActivity() {
                     onSeek = { viewModel.seekTo(it) },
                     onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) },
                     onSelectAudioTrack = { viewModel.setAudioTrack(it) },
-                    onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) }
+                    onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) },
+                    onSubtitleAppearance = { size, position -> viewModel.setSubtitleAppearance(size, position) }
                 )
             }
         }

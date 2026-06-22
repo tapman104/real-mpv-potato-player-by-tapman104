@@ -24,6 +24,7 @@ import com.tapman104.mpvplayer.state.AudioTrack
 import com.tapman104.mpvplayer.state.SubtitleTrack
 import com.tapman104.mpvplayer.ui.dialogs.AudioTrackDialog
 import com.tapman104.mpvplayer.ui.dialogs.SubtitleTrackDialog
+import com.tapman104.mpvplayer.ui.components.SubtitleAppearanceDialog
 
 @Composable
 fun PlayerTopBar(
@@ -35,10 +36,14 @@ fun PlayerTopBar(
     selectedSubtitleTrackId: Int,
     onSelectAudioTrack: (Int) -> Unit,
     onSelectSubtitleTrack: (Int) -> Unit,
+    subtitleSize: Float = 1.0f,
+    subtitlePosition: Float = 0.12f,
+    onSubtitleAppearance: (size: Float, position: Float) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     var showAudioDialog by remember { mutableStateOf(false) }
     var showSubtitleDialog by remember { mutableStateOf(false) }
+    var showSubtitleAppearance by remember { mutableStateOf(false) }
 
     if (showAudioDialog) {
         AudioTrackDialog(
@@ -55,7 +60,23 @@ fun PlayerTopBar(
             selectedTrackId = selectedSubtitleTrackId,
             onSelectTrack = onSelectSubtitleTrack,
             onDisableSubtitles = { onSelectSubtitleTrack(-1) },
-            onDismiss = { showSubtitleDialog = false }
+            onDismiss = { showSubtitleDialog = false },
+            onAppearanceClick = {
+                showSubtitleDialog = false
+                showSubtitleAppearance = true
+            }
+        )
+    }
+
+    if (showSubtitleAppearance) {
+        SubtitleAppearanceDialog(
+            initialSize = subtitleSize,
+            initialPosition = subtitlePosition,
+            onApply = { size, position ->
+                onSubtitleAppearance(size, position)
+                showSubtitleAppearance = false
+            },
+            onDismiss = { showSubtitleAppearance = false },
         )
     }
 

@@ -22,11 +22,21 @@ fun SubtitleTrackDialog(
     selectedTrackId: Int,
     onSelectTrack: (Int) -> Unit,
     onDisableSubtitles: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onAppearanceClick: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        confirmButton = {},
+        confirmButton = {
+            Button(
+                onClick = onAppearanceClick,
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF8B5CF6)
+                )
+            ) {
+                Text("Appearance", color = Color.White)
+            }
+        },
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text("Close", color = Color.White)
