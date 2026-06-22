@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    id("org.jetbrains.kotlin.kapt")
 }
 android {
     namespace = "com.tapman104.mpvplayer"
@@ -43,4 +44,7 @@ dependencies {
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.preference.ktx)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 }

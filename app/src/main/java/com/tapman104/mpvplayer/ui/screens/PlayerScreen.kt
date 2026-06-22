@@ -25,6 +25,14 @@ fun PlayerScreen(
     onSelectSubtitleTrack: (Int) -> Unit,
     onSubtitleAppearance: (size: Float, position: Float) -> Unit = { _, _ -> },
     onSubtitleReset: () -> Unit = {},
+    // Resume dialog
+    showResumeDialog: Boolean = false,
+    resumePositionMs: Long = 0L,
+    onResume: () -> Unit = {},
+    onStartOver: () -> Unit = {},
+    onDismissResume: () -> Unit = {},
+    // Auto-subtitle
+    onAutoSelectSubtitle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -53,7 +61,14 @@ fun PlayerScreen(
             onSelectSubtitleTrack = onSelectSubtitleTrack,
             onSubtitleAppearance = onSubtitleAppearance,
             onSubtitleReset = onSubtitleReset,
+            showResumeDialog = showResumeDialog,
+            resumePositionMs = resumePositionMs,
+            onResume = onResume,
+            onStartOver = onStartOver,
+            onDismissResume = onDismissResume,
+            onAutoSelectSubtitle = onAutoSelectSubtitle,
             modifier = Modifier.fillMaxSize()
         )
     }
 }
+

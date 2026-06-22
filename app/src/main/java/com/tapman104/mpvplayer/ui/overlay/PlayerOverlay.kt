@@ -19,6 +19,7 @@ import com.tapman104.mpvplayer.state.PlayerState
 import com.tapman104.mpvplayer.state.PlaylistState
 import com.tapman104.mpvplayer.ui.components.PlayerTopBar
 import com.tapman104.mpvplayer.ui.components.PlayerBottomBar
+import com.tapman104.mpvplayer.ui.dialogs.ResumeDialog
 import com.tapman104.mpvplayer.ui.dialogs.SubtitleAppearanceDialog
 import kotlinx.coroutines.delay
 
@@ -34,6 +35,14 @@ fun PlayerOverlay(
     onSelectSubtitleTrack: (Int) -> Unit,
     onSubtitleAppearance: (size: Float, position: Float) -> Unit,
     onSubtitleReset: () -> Unit,
+    // Resume dialog
+    showResumeDialog: Boolean = false,
+    resumePositionMs: Long = 0L,
+    onResume: () -> Unit = {},
+    onStartOver: () -> Unit = {},
+    onDismissResume: () -> Unit = {},
+    // Auto-subtitle
+    onAutoSelectSubtitle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
@@ -43,6 +52,14 @@ fun PlayerOverlay(
         if (controlsVisible) {
             delay(3000L)
             controlsVisible = false
+        }
+    }
+
+    // Auto-select subtitle once per file load (fires when non-empty tracks arrive).
+    val subtitleTracks = playerState.subtitleTracks
+    LaunchedEffect(subtitleTracks) {
+        if (subtitleTracks.isNotEmpty()) {
+            onAutoSelectSubtitle()
         }
     }
 
@@ -128,5 +145,16 @@ fun PlayerOverlay(
                 onDismiss = { showSubtitleAppearance = false },
             )
         }
+
+        if (showResumeDialog && resumePositionMs > 5000L) {
+            ResumeDialog(
+                resumePositionMs = resumePositionMs,
+                onResume = onResume,
+                onStartOver = onStartOver,
+                onDismiss = onDismissResume
+            )
+        }
     }
 }
+
+

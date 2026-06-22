@@ -12,14 +12,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.*
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tapman104.mpvplayer.ui.screens.PlayerScreen
 import com.tapman104.mpvplayer.ui.theme.MpvPlayerTheme
 import com.tapman104.mpvplayer.viewmodel.PlayerViewModel
 import com.tapman104.mpvplayer.viewmodel.PlayerViewModelFactory
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 class PlayerActivity : ComponentActivity() {
 
@@ -45,8 +46,13 @@ class PlayerActivity : ComponentActivity() {
     private val filePickerLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
-        uri?.let { viewModel.loadAndPlay(it) }
+        uri?.let {
+            viewModel.loadAndPlay(it)
+        }
     }
+
+    /** The URI string of the currently loaded file — used as the resume key. */
+    private var currentFilePath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,9 +80,36 @@ class PlayerActivity : ComponentActivity() {
 
         setContent {
             MpvPlayerTheme {
+                val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+                val playlistState by viewModel.playlistState.collectAsStateWithLifecycle()
+
+                // Hoist resume dialog state into Compose
+                var showResume by remember { mutableStateOf(false) }
+                var resumeMs by remember { mutableStateOf(0L) }
+
+                // Save position whenever playback pauses (isPlaying flips to false)
+                val isPlaying = playerState.isPlaying
+                LaunchedEffect(isPlaying) {
+                    if (!isPlaying) {
+                        val path = currentFilePath ?: return@LaunchedEffect
+                        val posMs = playerState.currentPositionMs
+                        viewModel.saveCurrentPosition(path, posMs)
+                    }
+                }
+
+                // Detect new file loads via playlist change, load resume position once per file.
+                LaunchedEffect(playlistState.currentUri) {
+                    val uriStr = playlistState.currentUri ?: return@LaunchedEffect
+                    currentFilePath = uriStr
+                    viewModel.loadResumePosition(uriStr) { savedMs ->
+                        resumeMs = savedMs ?: 0L
+                        showResume = (savedMs != null && savedMs > 5000L)
+                    }
+                }
+
                 PlayerScreen(
-                    playerState = viewModel.playerState.collectAsStateWithLifecycle().value,
-                    playlistState = viewModel.playlistState.collectAsStateWithLifecycle().value,
+                    playerState = playerState,
+                    playlistState = playlistState,
                     surfaceView = surfaceView,
                     onTogglePlay = { viewModel.togglePlay() },
                     onSeek = { viewModel.seekTo(it) },
@@ -84,8 +117,25 @@ class PlayerActivity : ComponentActivity() {
                     onSpeedChange = { viewModel.setSpeed(it) },
                     onSelectAudioTrack = { viewModel.setAudioTrack(it) },
                     onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) },
-                    onSubtitleAppearance = { size, position -> viewModel.setSubtitleAppearance(size, position) },
-                    onSubtitleReset = { viewModel.resetSubtitleAppearance() }
+                    onSubtitleAppearance = { size, position ->
+                        viewModel.setSubtitleAppearance(size, position)
+                    },
+                    onSubtitleReset = { viewModel.resetSubtitleAppearance() },
+                    // Resume dialog
+                    showResumeDialog = showResume,
+                    resumePositionMs = resumeMs,
+                    onResume = {
+                        viewModel.seekTo(resumeMs)
+                    },
+                    onStartOver = {
+                        currentFilePath?.let { viewModel.clearResumePosition(it) }
+                        viewModel.seekTo(0L)
+                    },
+                    onDismissResume = { showResume = false },
+                    // Auto-subtitle
+                    onAutoSelectSubtitle = {
+                        viewModel.autoSelectSubtitle(playerState.subtitleTracks)
+                    }
                 )
             }
         }

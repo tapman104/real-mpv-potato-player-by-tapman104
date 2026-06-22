@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.tapman104.mpvplayer.data.SubtitlePreferences
+import com.tapman104.mpvplayer.data.db.ResumePositionDao
+import com.tapman104.mpvplayer.data.db.ResumePositionEntity
+import com.tapman104.mpvplayer.data.preferences.UserPreferencesRepository
 import com.tapman104.mpvplayer.engine.MpvController
 import com.tapman104.mpvplayer.engine.MpvConstants
 import com.tapman104.mpvplayer.engine.MpvEventListener
@@ -21,7 +24,11 @@ import com.tapman104.mpvplayer.state.*
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVNode
 
-class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListener {
+class PlayerViewModel(
+    private val context: Context,
+    private val resumePositionDao: ResumePositionDao,
+    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel(), MpvEventListener {
     private val TAG = "PlayerViewModel"
 
     private var pendingFileUri: Uri? = null
@@ -42,6 +49,13 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     private val _playlistState = MutableStateFlow(PlaylistState())
     val playlistState: StateFlow<PlaylistState> = _playlistState.asStateFlow()
 
+    // ---------------------------------------------------------------------------
+    // Preferred subtitle language (from user preferences)
+    // ---------------------------------------------------------------------------
+
+    private val _preferredSubtitleLang = MutableStateFlow(UserPreferencesRepository.DEFAULT_SUBTITLE_LANGUAGE)
+    val preferredSubtitleLang: StateFlow<String> = _preferredSubtitleLang.asStateFlow()
+
     init {
         controller.dispatcher.addListener(this)
         controller.init()
@@ -53,7 +67,14 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
             }
         }
 
-        // Load persisted subtitle preferences and apply them immediately.
+        // Collect preferred subtitle language from DataStore.
+        viewModelScope.launch {
+            userPreferencesRepository.subtitleLanguage.collect {
+                _preferredSubtitleLang.value = it
+            }
+        }
+
+        // Load persisted subtitle appearance preferences and apply them immediately.
         viewModelScope.launch {
             combine(
                 SubtitlePreferences.sizeFlow(context),
@@ -289,6 +310,58 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
         controller.executor.setSubtitleAppearance(size, position)
         viewModelScope.launch {
             SubtitlePreferences.reset(context)
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Resume position
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Saves the current playback position for [filePath].
+     * Positions under 5 seconds are ignored to avoid saving very early scrubs.
+     */
+    fun saveCurrentPosition(filePath: String, positionMs: Long) {
+        viewModelScope.launch {
+            if (positionMs > 5000L) {
+                resumePositionDao.savePosition(
+                    ResumePositionEntity(filePath = filePath, positionMs = positionMs)
+                )
+            }
+        }
+    }
+
+    /**
+     * Loads the saved resume position for [filePath] and delivers it via [onResult].
+     * Returns null if no position is stored.
+     */
+    fun loadResumePosition(filePath: String, onResult: (Long?) -> Unit) {
+        viewModelScope.launch {
+            val entity = resumePositionDao.getPosition(filePath)
+            onResult(entity?.positionMs)
+        }
+    }
+
+    /** Deletes the saved resume position for [filePath] (e.g. user chose "Start Over"). */
+    fun clearResumePosition(filePath: String) {
+        viewModelScope.launch {
+            resumePositionDao.deletePosition(filePath)
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Auto-subtitle selection
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Selects the first subtitle track whose language starts with [preferredSubtitleLang].
+     * Call this once after tracks are loaded (keyed LaunchedEffect in UI).
+     */
+    fun autoSelectSubtitle(tracks: List<SubtitleTrack>) {
+        val lang = _preferredSubtitleLang.value
+        val match = tracks.firstOrNull { it.lang.lowercase().startsWith(lang.lowercase()) }
+        if (match != null) {
+            setSubtitleTrack(match.id)
         }
     }
 
