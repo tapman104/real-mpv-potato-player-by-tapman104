@@ -27,7 +27,7 @@ fun PlayPauseButton(
                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 tint = Color.White,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(56.dp)
             )
         }
     }

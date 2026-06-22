@@ -65,6 +65,8 @@ fun PlayerOverlay(
         ) {
             PlayerTopBar(
                 fileName = fileName,
+                speed = playerState.speed,
+                onBack = {},
                 onOpenFile = onOpenFile,
                 audioTracks = playerState.audioTracks,
                 selectedAudioTrackId = playerState.selectedAudioTrackId,
@@ -72,9 +74,6 @@ fun PlayerOverlay(
                 selectedSubtitleTrackId = playerState.selectedSubtitleTrackId,
                 onSelectAudioTrack = onSelectAudioTrack,
                 onSelectSubtitleTrack = onSelectSubtitleTrack,
-                subtitleSize = playerState.subtitleSize,
-                subtitlePosition = playerState.subtitlePosition,
-                onAppearanceClick = { showSubtitleAppearance = true },
             )
         }
 
