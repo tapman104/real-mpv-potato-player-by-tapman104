@@ -12,6 +12,26 @@ class MpvController(private val context: Context) {
 
     private var initialized = false
 
+    private fun copyFontAsset() {
+        val fontsDir = java.io.File(context.filesDir, "fonts")
+        if (!fontsDir.exists()) {
+            fontsDir.mkdirs()
+        }
+        val fontFile = java.io.File(fontsDir, "Roboto-Regular.ttf")
+        if (!fontFile.exists()) {
+            try {
+                context.assets.open("Roboto-Regular.ttf").use { inputStream ->
+                    java.io.FileOutputStream(fontFile).use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+                Log.d(TAG, "Copied Roboto-Regular.ttf to fonts directory")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to copy font asset", e)
+            }
+        }
+    }
+
     fun init() {
         if (initialized) return
         Log.d(TAG, "Initializing MPV engine")
@@ -30,6 +50,13 @@ class MpvController(private val context: Context) {
                 MPVLib.setOptionString("gpu-context", "android")
                 MPVLib.setOptionString("hwdec", "mediacodec-copy")
                 MPVLib.setOptionString("keep-open", "yes")
+                
+                // Setup fonts
+                copyFontAsset()
+                MPVLib.setOptionString("sub-fonts-dir", "${context.filesDir.path}/fonts")
+                MPVLib.setOptionString("sub-font", "Roboto")
+                MPVLib.setOptionString("sub-font-provider", "none")
+                MPVLib.setOptionString("sub-ass-override", "force")
                 
                 // Initialize MPV
                 MPVLib.init()
