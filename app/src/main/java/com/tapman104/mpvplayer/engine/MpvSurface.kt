@@ -8,6 +8,9 @@ import `is`.xyz.mpv.MPVLib
 class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callback {
     private val TAG = "MpvSurface"
     private var attachedSurface: Surface? = null
+    var onSurfaceReady: (() -> Unit)? = null
+
+    fun hasSurface(): Boolean = attachedSurface != null
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         Log.d(TAG, "surfaceCreated: surface is valid = ${holder.surface?.isValid}")
@@ -17,6 +20,7 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
             executor.execute {
                 Log.d(TAG, "Calling MPVLib.attachSurface")
                 MPVLib.attachSurface(surface)
+                onSurfaceReady?.invoke()
             }
         }
     }

@@ -17,6 +17,8 @@ import `is`.xyz.mpv.MPVNode
 
 class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListener {
 
+    private var pendingFileUri: Uri? = null
+
     val controller = MpvController(context)
 
     private val _playerState = MutableStateFlow(PlayerState())
@@ -31,6 +33,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     init {
         controller.dispatcher.addListener(this)
         controller.init()
+        controller.surface.onSurfaceReady = { onSurfaceReady() }
     }
 
     // ---------------------------------------------------------------------------
@@ -89,6 +92,17 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
             }
         }
         _playerState.update { it.copy(isLoading = true, error = null) }
+
+        if (controller.surface.hasSurface()) {
+            controller.executor.loadFile(resolveUri(uri))
+        } else {
+            pendingFileUri = uri
+        }
+    }
+
+    fun onSurfaceReady() {
+        val uri = pendingFileUri ?: return
+        pendingFileUri = null
         controller.executor.loadFile(resolveUri(uri))
     }
 
