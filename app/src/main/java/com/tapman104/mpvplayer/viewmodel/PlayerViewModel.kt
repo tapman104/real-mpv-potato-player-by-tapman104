@@ -313,7 +313,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
             surfaceWasLost = true
         }
         // Auto-advance: endReason 0 = EOF (natural end). Advance playlist only on natural end.
-        if (endReason == 0) {
+        if (endReason == 0 && !surfaceWasLost) {
             playNext()
         }
     }
