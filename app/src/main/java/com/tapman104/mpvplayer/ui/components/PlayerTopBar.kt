@@ -24,7 +24,7 @@ import com.tapman104.mpvplayer.state.AudioTrack
 import com.tapman104.mpvplayer.state.SubtitleTrack
 import com.tapman104.mpvplayer.ui.dialogs.AudioTrackDialog
 import com.tapman104.mpvplayer.ui.dialogs.SubtitleTrackDialog
-import com.tapman104.mpvplayer.ui.components.SubtitleAppearanceDialog
+
 
 @Composable
 fun PlayerTopBar(
@@ -38,12 +38,11 @@ fun PlayerTopBar(
     onSelectSubtitleTrack: (Int) -> Unit,
     subtitleSize: Float = 1.0f,
     subtitlePosition: Float = 0.12f,
-    onSubtitleAppearance: (size: Float, position: Float) -> Unit = { _, _ -> },
+    onAppearanceClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showAudioDialog by remember { mutableStateOf(false) }
     var showSubtitleDialog by remember { mutableStateOf(false) }
-    var showSubtitleAppearance by remember { mutableStateOf(false) }
 
     if (showAudioDialog) {
         AudioTrackDialog(
@@ -63,22 +62,11 @@ fun PlayerTopBar(
             onDismiss = { showSubtitleDialog = false },
             onAppearanceClick = {
                 showSubtitleDialog = false
-                showSubtitleAppearance = true
+                onAppearanceClick()
             }
         )
     }
 
-    if (showSubtitleAppearance) {
-        SubtitleAppearanceDialog(
-            initialSize = subtitleSize,
-            initialPosition = subtitlePosition,
-            onApply = { size, position ->
-                onSubtitleAppearance(size, position)
-                showSubtitleAppearance = false
-            },
-            onDismiss = { showSubtitleAppearance = false },
-        )
-    }
 
     Row(
         modifier = modifier

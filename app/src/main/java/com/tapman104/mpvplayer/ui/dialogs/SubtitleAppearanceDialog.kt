@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.ui.components
+package com.tapman104.mpvplayer.ui.dialogs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

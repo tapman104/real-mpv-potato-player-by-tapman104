@@ -25,6 +25,7 @@ import com.tapman104.mpvplayer.state.PlaylistState
 import com.tapman104.mpvplayer.state.SubtitleTrack
 import com.tapman104.mpvplayer.ui.components.PlayerTopBar
 import com.tapman104.mpvplayer.ui.components.PlayerBottomBar
+import com.tapman104.mpvplayer.ui.dialogs.SubtitleAppearanceDialog
 import kotlinx.coroutines.delay
 
 @Composable
@@ -41,6 +42,7 @@ fun PlayerScreen(
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
+    var showSubtitleAppearance by remember { mutableStateOf(false) }
 
     LaunchedEffect(controlsVisible) {
         if (controlsVisible) {
@@ -90,7 +92,7 @@ fun PlayerScreen(
                 onSelectSubtitleTrack = onSelectSubtitleTrack,
                 subtitleSize = playerState.subtitleSize,
                 subtitlePosition = playerState.subtitlePosition,
-                onSubtitleAppearance = onSubtitleAppearance,
+                onAppearanceClick = { showSubtitleAppearance = true },
             )
         }
 
@@ -125,6 +127,18 @@ fun PlayerScreen(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(16.dp)
+            )
+        }
+
+        if (showSubtitleAppearance) {
+            SubtitleAppearanceDialog(
+                initialSize = playerState.subtitleSize,
+                initialPosition = playerState.subtitlePosition,
+                onApply = { size, position ->
+                    onSubtitleAppearance(size, position)
+                    showSubtitleAppearance = false
+                },
+                onDismiss = { showSubtitleAppearance = false },
             )
         }
     }
