@@ -2,11 +2,17 @@ package com.tapman104.mpvplayer.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import com.tapman104.mpvplayer.data.SubtitlePreferences
 import com.tapman104.mpvplayer.engine.MpvController
 import com.tapman104.mpvplayer.engine.MpvConstants
 import com.tapman104.mpvplayer.engine.MpvEventListener
@@ -16,8 +22,14 @@ import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVNode
 
 class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListener {
+    private val TAG = "PlayerViewModel"
 
     private var pendingFileUri: Uri? = null
+
+    // Surface recovery state
+    private var lastPlayedUri: Uri? = null
+    private var lastPosition: Double = 0.0
+    var surfaceWasLost = false
 
     val controller = MpvController(context)
 
@@ -33,7 +45,25 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     init {
         controller.dispatcher.addListener(this)
         controller.init()
-        controller.surface.onSurfaceReady = { onSurfaceReady() }
+        controller.surface.onSurfaceReady = {
+            if (surfaceWasLost) {
+                onSurfaceRecovered()
+            } else {
+                onSurfaceReady()
+            }
+        }
+
+        // Load persisted subtitle preferences and apply them immediately.
+        viewModelScope.launch {
+            combine(
+                SubtitlePreferences.sizeFlow(context),
+                SubtitlePreferences.positionFlow(context)
+            ) { size, position -> Pair(size, position) }
+                .collect { (size, position) ->
+                    _playerState.update { it.copy(subtitleSize = size, subtitlePosition = position) }
+                    controller.executor.setSubtitleAppearance(size, position)
+                }
+        }
     }
 
     // ---------------------------------------------------------------------------
@@ -77,6 +107,9 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
         } catch (e: SecurityException) {
             // Permission may already be held or not grantable; proceed anyway
         }
+        // Track the last-played URI for VO recovery after lock
+        lastPlayedUri = uri
+        surfaceWasLost = false
         // Update playlist state so currentUri reflects the new file immediately.
         // If the URI is already in the list, jump to it; otherwise append and jump.
         _playlistState.update { current ->
@@ -104,6 +137,31 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
         val uri = pendingFileUri ?: return
         pendingFileUri = null
         controller.executor.loadFile(resolveUri(uri))
+    }
+
+    /**
+     * Called when the surface is re-created after a fatal VO loss (e.g. phone lock).
+     * Reloads the last-played file and seeks back to the saved position.
+     */
+    fun onSurfaceRecovered() {
+        Log.d(TAG, "onSurfaceRecovered: reloading uri=$lastPlayedUri at pos=$lastPosition")
+        surfaceWasLost = false
+        val uri = lastPlayedUri ?: return
+        val savedPosition = lastPosition
+        viewModelScope.launch {
+            delay(200L) // let MPV finish attaching the new surface
+            controller.executor.loadFile(resolveUri(uri))
+            if (savedPosition > 1.0) {
+                delay(800L) // let the file open and buffering start
+                controller.executor.seekAbsolute(savedPosition)
+            }
+        }
+    }
+
+    /** Pauses playback immediately — used by screen-off receiver. */
+    fun pausePlayback() {
+        controller.executor.pause()
+        _playerState.update { it.copy(isPlaying = false) }
     }
 
     // ---------------------------------------------------------------------------
@@ -219,6 +277,19 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     fun setSubtitleAppearance(size: Float, position: Float) {
         _playerState.update { it.copy(subtitleSize = size, subtitlePosition = position) }
         controller.executor.setSubtitleAppearance(size, position)
+        viewModelScope.launch {
+            SubtitlePreferences.save(context, size, position)
+        }
+    }
+
+    fun resetSubtitleAppearance() {
+        val size = SubtitlePreferences.DEFAULT_SIZE
+        val position = SubtitlePreferences.DEFAULT_POSITION
+        _playerState.update { it.copy(subtitleSize = size, subtitlePosition = position) }
+        controller.executor.setSubtitleAppearance(size, position)
+        viewModelScope.launch {
+            SubtitlePreferences.reset(context)
+        }
     }
 
 
@@ -236,6 +307,11 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
 
     override fun onPlaybackStopped(endReason: Int) {
         _playerState.update { it.copy(isPlaying = false) }
+        // MPV_END_FILE_REASON_ERROR = 4. If the surface is also gone, the VO crashed on lock.
+        if (endReason == 4 && !controller.surface.hasSurface() && lastPlayedUri != null) {
+            Log.d(TAG, "VO fatal error while surface is gone — flagging for recovery on next surfaceCreated")
+            surfaceWasLost = true
+        }
         // Auto-advance: endReason 0 = EOF (natural end). Advance playlist only on natural end.
         if (endReason == 0) {
             playNext()
@@ -250,6 +326,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
             }
             MpvConstants.PROP_TIME_POS -> {
                 val seconds = value as? Double ?: return
+                lastPosition = seconds // track for VO recovery
                 _playerState.update { it.copy(currentPositionMs = (seconds * 1000).toLong()) }
             }
             MpvConstants.PROP_DURATION -> {

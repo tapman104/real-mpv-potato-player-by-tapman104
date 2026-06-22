@@ -39,6 +39,7 @@ fun PlayerScreen(
     onSelectAudioTrack: (Int) -> Unit,
     onSelectSubtitleTrack: (Int) -> Unit,
     onSubtitleAppearance: (size: Float, position: Float) -> Unit = { _, _ -> },
+    onSubtitleReset: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
@@ -136,6 +137,10 @@ fun PlayerScreen(
                 initialPosition = playerState.subtitlePosition,
                 onApply = { size, position ->
                     onSubtitleAppearance(size, position)
+                    showSubtitleAppearance = false
+                },
+                onReset = {
+                    onSubtitleReset()
                     showSubtitleAppearance = false
                 },
                 onDismiss = { showSubtitleAppearance = false },

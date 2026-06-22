@@ -42,4 +42,5 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.preference.ktx)
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }

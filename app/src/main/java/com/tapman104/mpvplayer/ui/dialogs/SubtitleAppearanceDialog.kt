@@ -16,6 +16,7 @@ fun SubtitleAppearanceDialog(
     initialPosition: Float,
     onApply: (size: Float, position: Float) -> Unit,
     onDismiss: () -> Unit,
+    onReset: () -> Unit = {},
 ) {
     var size by remember { mutableStateOf(initialSize) }
     var position by remember { mutableStateOf(initialPosition) }
@@ -91,17 +92,27 @@ fun SubtitleAppearanceDialog(
             }
         },
         confirmButton = {
-            Button(
-                onClick = { onApply(size, position) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Apply", color = Color.White, fontWeight = FontWeight.Bold)
+                TextButton(onClick = {
+                    onReset()
+                    onDismiss()
+                }) {
+                    Text("Reset", color = Color.White.copy(alpha = 0.7f))
+                }
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel", color = Color.White)
+                }
+                Button(
+                    onClick = { onApply(size, position) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                ) {
+                    Text("Apply", color = Color.White, fontWeight = FontWeight.Bold)
+                }
             }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = Color.White)
-            }
-        },
+        dismissButton = {},
     )
 }

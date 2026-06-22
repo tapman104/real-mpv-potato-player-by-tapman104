@@ -39,6 +39,12 @@ class MpvCommandExecutor {
         }
     }
 
+    fun seekAbsolute(seconds: Double) {
+        execute {
+            MPVLib.command("seek", seconds.toString(), "absolute")
+        }
+    }
+
     fun seekRelative(seconds: Double) {
         execute {
             MPVLib.command("seek", seconds.toString(), "relative")

@@ -1,6 +1,9 @@
 package com.tapman104.mpvplayer
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.view.SurfaceView
@@ -26,6 +29,19 @@ class PlayerActivity : ComponentActivity() {
 
     private lateinit var surfaceView: SurfaceView
 
+    /**
+     * Pauses playback when the screen turns off (power button).
+     * Using a BroadcastReceiver rather than onPause so that dialogs,
+     * notifications, and picture-in-picture transitions do NOT pause playback.
+     */
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_SCREEN_OFF) {
+                viewModel.pausePlayback()
+            }
+        }
+    }
+
     private val filePickerLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -35,7 +51,7 @@ class PlayerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Keep screen on during playback
+        // Keep screen on during playback (power button still fires ACTION_SCREEN_OFF)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         // Edge-to-edge layout
@@ -46,6 +62,9 @@ class PlayerActivity : ComponentActivity() {
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             hide(WindowInsetsCompat.Type.systemBars())
         }
+
+        // Register screen-off receiver to pause audio on lock
+        registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
 
         // Create the SurfaceView that mpv will render into
         surfaceView = SurfaceView(this)
@@ -64,7 +83,8 @@ class PlayerActivity : ComponentActivity() {
                     onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) },
                     onSelectAudioTrack = { viewModel.setAudioTrack(it) },
                     onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) },
-                    onSubtitleAppearance = { size, position -> viewModel.setSubtitleAppearance(size, position) }
+                    onSubtitleAppearance = { size, position -> viewModel.setSubtitleAppearance(size, position) },
+                    onSubtitleReset = { viewModel.resetSubtitleAppearance() }
                 )
             }
         }
@@ -76,5 +96,10 @@ class PlayerActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.data?.let { viewModel.loadAndPlay(it) }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(screenOffReceiver)
     }
 }
