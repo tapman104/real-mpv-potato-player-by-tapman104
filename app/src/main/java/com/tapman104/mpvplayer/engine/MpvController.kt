@@ -82,7 +82,7 @@ class MpvController(private val context: Context) {
         Log.d(TAG, "Destroying MPV engine")
         initialized = false
 
-        surface.detachForce()
+        executor.detachSurface()
 
         executor.execute {
             try {
