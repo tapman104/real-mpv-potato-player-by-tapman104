@@ -29,7 +29,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
     // Surface recovery state
     private var lastPlayedUri: Uri? = null
     private var lastPosition: Double = 0.0
-    var surfaceWasLost = false
+    @Volatile var surfaceWasLost = false
 
     val controller = MpvController(context)
 
@@ -149,7 +149,7 @@ class PlayerViewModel(private val context: Context) : ViewModel(), MpvEventListe
         val uri = lastPlayedUri ?: return
         val savedPosition = lastPosition
         viewModelScope.launch {
-            delay(200L) // let MPV finish attaching the new surface
+            delay(500L) // let MPV finish attaching the new surface
             controller.executor.loadFile(resolveUri(uri))
             if (savedPosition > 1.0) {
                 delay(800L) // let the file open and buffering start

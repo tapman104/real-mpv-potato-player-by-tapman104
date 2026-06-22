@@ -13,16 +13,13 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
     fun hasSurface(): Boolean = attachedSurface != null
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        Log.d(TAG, "surfaceCreated: surface is valid = ${holder.surface?.isValid}")
-        val surface = holder.surface
-        if (surface != null && surface.isValid) {
-            attachedSurface = surface
-            executor.execute {
-                Log.d(TAG, "Calling MPVLib.attachSurface")
-                MPVLib.attachSurface(surface)
-                onSurfaceReady?.invoke()
-            }
+        val surface = holder.surface ?: return
+        if (!surface.isValid) return
+        attachedSurface = surface
+        executor.execute {
+            MPVLib.attachSurface(surface)
         }
+        onSurfaceReady?.invoke()   // called on main thread, AFTER attach is queued
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
