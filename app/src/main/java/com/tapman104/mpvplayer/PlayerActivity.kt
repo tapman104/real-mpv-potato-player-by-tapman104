@@ -113,8 +113,11 @@ class PlayerActivity : ComponentActivity() {
                     surfaceView = surfaceView,
                     onTogglePlay = { viewModel.togglePlay() },
                     onSeek = { viewModel.seekTo(it) },
+                    onSeekRelative = { viewModel.seekRelative(it) },
                     onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) },
                     onSpeedChange = { viewModel.setSpeed(it) },
+                    onSpeedOverride = { viewModel.setSpeed(it) },
+                    onSpeedRestore = { viewModel.setSpeed(playerState.speed) },
                     onSelectAudioTrack = { viewModel.setAudioTrack(it) },
                     onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) },
                     onSubtitleAppearance = { size, position ->

@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import com.tapman104.mpvplayer.state.PlayerState
 import com.tapman104.mpvplayer.state.PlaylistState
+import com.tapman104.mpvplayer.ui.components.GestureOverlay
 import com.tapman104.mpvplayer.ui.overlay.PlayerOverlay
 
 @Composable
@@ -19,8 +20,11 @@ fun PlayerScreen(
     surfaceView: SurfaceView,
     onTogglePlay: () -> Unit,
     onSeek: (Long) -> Unit,
+    onSeekRelative: (Long) -> Unit = {},
     onOpenFile: () -> Unit,
     onSpeedChange: (Float) -> Unit,
+    onSpeedOverride: (Float) -> Unit = {},
+    onSpeedRestore: () -> Unit = {},
     onSelectAudioTrack: (Int) -> Unit,
     onSelectSubtitleTrack: (Int) -> Unit,
     onSubtitleAppearance: (size: Float, position: Float) -> Unit = { _, _ -> },
@@ -47,6 +51,14 @@ fun PlayerScreen(
             // reference alive prevents Compose from recycling/destroying the
             // SurfaceHolder that mpv renders into (which causes a black screen).
             update = { /* intentional no-op: reuse existing SurfaceView */ },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        GestureOverlay(
+            onSeekForward = { onSeekRelative(10_000L) },
+            onSeekBackward = { onSeekRelative(-10_000L) },
+            onSpeedOverride = onSpeedOverride,
+            onSpeedRestore = onSpeedRestore,
             modifier = Modifier.fillMaxSize()
         )
 
