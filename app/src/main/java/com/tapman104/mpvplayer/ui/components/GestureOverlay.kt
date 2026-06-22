@@ -57,6 +57,7 @@ fun GestureOverlay(
                     launch {
                         detectTapGestures(
                             onDoubleTap = { offset ->
+                                android.util.Log.d("GestureOverlay", "double tap detected")
                                 if (offset.x < size.width / 2) {
                                     onSeekBackward()
                                     seekLabel = "-10s"
@@ -75,7 +76,7 @@ fun GestureOverlay(
                     launch {
                         awaitPointerEventScope {
                             while (true) {
-                                val event = awaitPointerEvent()
+                                val event = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Main)
                                 if (event.type == PointerEventType.Release && isLongPressing) {
                                     isLongPressing = false
                                     onSpeedRestore()

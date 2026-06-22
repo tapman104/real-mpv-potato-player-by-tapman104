@@ -39,6 +39,8 @@ fun PlayerScreen(
     onAutoSelectSubtitle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var controlsVisible by remember { mutableStateOf(true) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -46,12 +48,37 @@ fun PlayerScreen(
             .then(modifier)
     ) {
         AndroidView(
-            factory = { surfaceView },
+            factory = { 
+                surfaceView.apply {
+                    setOnTouchListener { _, _ -> false } // don't consume — let Compose handle it
+                }
+            },
             // update is called on every recomposition — keeping the SurfaceView
             // reference alive prevents Compose from recycling/destroying the
             // SurfaceHolder that mpv renders into (which causes a black screen).
-            update = { /* intentional no-op: reuse existing SurfaceView */ },
+            update = { view -> 
+                view.setOnTouchListener { _, _ -> false }
+            },
             modifier = Modifier.fillMaxSize()
+        )
+
+        // Separate tap layer to toggle controls without consuming double taps in GestureOverlay
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
+                            if (event.type == androidx.compose.ui.input.pointer.PointerEventType.Release) {
+                                // Simple tap detection to toggle controls
+                                if (!controlsVisible) {
+                                    controlsVisible = true
+                                }
+                            }
+                        }
+                    }
+                }
         )
 
         GestureOverlay(
@@ -65,6 +92,8 @@ fun PlayerScreen(
         PlayerOverlay(
             playerState = playerState,
             playlistState = playlistState,
+            controlsVisible = controlsVisible,
+            onControlsVisibilityChange = { controlsVisible = it },
             onTogglePlay = onTogglePlay,
             onSeek = onSeek,
             onOpenFile = onOpenFile,

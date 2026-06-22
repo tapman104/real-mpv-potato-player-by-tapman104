@@ -27,6 +27,8 @@ import kotlinx.coroutines.delay
 fun PlayerOverlay(
     playerState: PlayerState,
     playlistState: PlaylistState,
+    controlsVisible: Boolean,
+    onControlsVisibilityChange: (Boolean) -> Unit,
     onTogglePlay: () -> Unit,
     onSeek: (Long) -> Unit,
     onOpenFile: () -> Unit,
@@ -45,13 +47,12 @@ fun PlayerOverlay(
     onAutoSelectSubtitle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var controlsVisible by remember { mutableStateOf(true) }
     var showSubtitleAppearance by remember { mutableStateOf(false) }
 
     LaunchedEffect(controlsVisible) {
         if (controlsVisible) {
             delay(3000L)
-            controlsVisible = false
+            onControlsVisibilityChange(false)
         }
     }
 
@@ -70,10 +71,10 @@ fun PlayerOverlay(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { controlsVisible = true }
+            .pointerInput(controlsVisible) {
+                if (!controlsVisible) return@pointerInput
+                detectTapGestures(onTap = { onControlsVisibilityChange(false) })
+            }
     ) {
         AnimatedVisibility(
             visible = controlsVisible,
