@@ -88,7 +88,7 @@ fun PlayerTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 8.dp),
+            .padding(start = 4.dp, end = 4.dp, top = 24.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

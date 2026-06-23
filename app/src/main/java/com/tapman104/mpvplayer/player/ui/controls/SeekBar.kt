@@ -5,6 +5,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -27,23 +28,29 @@ fun PlayerSeekBar(
     // TODO: cache bar — demuxerCacheTimeMs is kept but not rendered visually yet
 
     Column(modifier = modifier) {
-        Slider(
-            value = fraction,
-            onValueChange = {
-                isDragging = true
-                dragPositionMs = (it * durationMs).toLong()
-            },
-            onValueChangeFinished = {
-                onSeek(dragPositionMs)
-                isDragging = false
-            },
-            colors = SliderDefaults.colors(
-                thumbColor = Color.White,
-                activeTrackColor = Color.White,
-                inactiveTrackColor = Color.White.copy(alpha = 0.3f)
-            ),
-            modifier = Modifier.padding(horizontal = 0.dp)
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth().height(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Slider(
+                value = fraction,
+                onValueChange = {
+                    isDragging = true
+                    dragPositionMs = (it * durationMs).toLong()
+                },
+                onValueChangeFinished = {
+                    onSeek(dragPositionMs)
+                    isDragging = false
+                },
+                colors = SliderDefaults.colors(
+                    thumbColor = Color.White,
+                    activeTrackColor = Color.White,
+                    inactiveTrackColor = Color.White.copy(alpha = 0.3f)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Spacer(Modifier.height(2.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
