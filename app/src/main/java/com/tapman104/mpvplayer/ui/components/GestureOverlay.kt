@@ -3,7 +3,6 @@ package com.tapman104.mpvplayer.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,14 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun GestureOverlay(
@@ -36,6 +33,7 @@ fun GestureOverlay(
     onSeekBackward: () -> Unit,
     onSpeedOverride: (Float) -> Unit,
     onSpeedRestore: () -> Unit,
+    onToggleControls: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var seekLabel by remember { mutableStateOf("") }
@@ -53,12 +51,47 @@ fun GestureOverlay(
         modifier = modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                coroutineScope {
-                    launch {
-                        detectTapGestures(
-                            onDoubleTap = { offset ->
-                                android.util.Log.d("GestureOverlay", "double tap detected")
-                                if (offset.x < size.width / 2) {
+                awaitEachGesture {
+                    val firstDown = awaitFirstDown(requireUnconsumed = false)
+                    firstDown.consume()
+
+                    val firstUp = withTimeoutOrNull(500L) {
+                        waitForUpOrCancellation()
+                    }
+
+                    if (firstUp == null) {
+                        // Long press timeout reached (500ms)
+                        isLongPressing = true
+                        onSpeedOverride(2.0f)
+
+                        // Wait until released
+                        do {
+                            val event = awaitPointerEvent(PointerEventPass.Main)
+                            event.changes.forEach { it.consume() }
+                        } while (event.changes.any { it.pressed })
+
+                        isLongPressing = false
+                        onSpeedRestore()
+                    } else {
+                        firstUp.consume()
+
+                        val secondDown = withTimeoutOrNull(300L) {
+                            awaitFirstDown(requireUnconsumed = false)
+                        }
+
+                        if (secondDown == null) {
+                            // No second tap within 300ms window, so it's a single tap
+                            onToggleControls()
+                        } else {
+                            secondDown.consume()
+                            
+                            val secondUp = withTimeoutOrNull(500L) {
+                                waitForUpOrCancellation()
+                            }
+                            
+                            if (secondUp != null) {
+                                secondUp.consume()
+                                if (secondUp.position.x < size.width / 2) {
                                     onSeekBackward()
                                     seekLabel = "-10s"
                                 } else {
@@ -66,21 +99,18 @@ fun GestureOverlay(
                                     seekLabel = "+10s"
                                 }
                                 labelTrigger++
-                            },
-                            onLongPress = {
+                            } else {
+                                // They held the second tap for > 500ms -> Long press
                                 isLongPressing = true
                                 onSpeedOverride(2.0f)
-                            }
-                        )
-                    }
-                    launch {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Main)
-                                if (event.type == PointerEventType.Release && isLongPressing) {
-                                    isLongPressing = false
-                                    onSpeedRestore()
-                                }
+                                
+                                do {
+                                    val event = awaitPointerEvent(PointerEventPass.Main)
+                                    event.changes.forEach { it.consume() }
+                                } while (event.changes.any { it.pressed })
+                                
+                                isLongPressing = false
+                                onSpeedRestore()
                             }
                         }
                     }

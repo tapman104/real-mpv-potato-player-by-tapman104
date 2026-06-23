@@ -11,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.viewinterop.AndroidView
 import com.tapman104.mpvplayer.model.PlayerState
 import com.tapman104.mpvplayer.model.PlaylistState
@@ -67,30 +66,12 @@ fun PlayerScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Separate tap layer to toggle controls without consuming double taps in GestureOverlay
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent(androidx.compose.ui.input.pointer.PointerEventPass.Initial)
-                            if (event.type == androidx.compose.ui.input.pointer.PointerEventType.Release) {
-                                // Simple tap detection to toggle controls
-                                if (!controlsVisible) {
-                                    controlsVisible = true
-                                }
-                            }
-                        }
-                    }
-                }
-        )
-
         GestureOverlay(
             onSeekForward = { onSeekRelative(10_000L) },
             onSeekBackward = { onSeekRelative(-10_000L) },
             onSpeedOverride = onSpeedOverride,
             onSpeedRestore = onSpeedRestore,
+            onToggleControls = { controlsVisible = !controlsVisible },
             modifier = Modifier.fillMaxSize()
         )
 

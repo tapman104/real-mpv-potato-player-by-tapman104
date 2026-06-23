@@ -13,8 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tapman104.mpvplayer.model.PlayerState
@@ -70,14 +68,7 @@ fun PlayerOverlay(
         ?.let { Uri.parse(it).lastPathSegment ?: it }
         ?: "No file loaded"
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .pointerInput(controlsVisible) {
-                if (!controlsVisible) return@pointerInput
-                detectTapGestures(onTap = { onControlsVisibilityChange(false) })
-            }
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         AnimatedVisibility(
             visible = controlsVisible,
             enter = fadeIn(),
