@@ -23,8 +23,13 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
      */
     @Volatile private var pendingAttachSurface: Surface? = null
 
+    private var voInUse: String = "gpu"
+
+    fun setVo(vo: String) {
+        voInUse = vo
+    }
+
     var onSurfaceReady: (() -> Unit)? = null
-    var onSurfaceDestroyed: (() -> Unit)? = null
 
     fun hasSurface(): Boolean = attachedSurface != null || pendingAttachSurface != null
 
@@ -34,44 +39,37 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
 
         attachedSurface = surface
         pendingAttachSurface = surface
-        // Increment the generation *before* queuing so any concurrent detachSurface
-        // that runs after us on the executor thread will see the updated generation
-        // and recognise itself as stale.
         val gen = executor.nextSurfaceGeneration()
-        // Capture callback ref now (main thread) so late changes to onSurfaceReady
-        // don't affect this particular surface-ready cycle.
         val callback = onSurfaceReady
+        val vo = voInUse
         executor.execute {
             Log.d(TAG, "attachSurface gen=$gen")
             MPVLib.attachSurface(surface)
+            MPVLib.setOptionString("force-window", "yes")
+            // If no file is pending (recovery after lock/recents),
+            // re-enable the VO so mpv resumes rendering.
+            // onSurfaceReady will only load a file if pendingFileUri != null.
+            MPVLib.setPropertyString("vo", vo)
             pendingAttachSurface = null
-            try { MPVLib.command("video-reload") } catch (_: Throwable) {}
             mainHandler.post { callback?.invoke() }
         }
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         Log.d(TAG, "surfaceChanged: width=$width, height=$height")
-        val surface = holder.surface ?: return
-        if (!surface.isValid) return
-        // Skip if we have already attached this surface or if it is already in the
-        // executor queue waiting to be attached (pendingAttachSurface).
-        if (surface == attachedSurface || surface == pendingAttachSurface) return
-
-        attachedSurface = surface
-        pendingAttachSurface = surface
-        val gen = executor.nextSurfaceGeneration()
-        executor.execute {
-            Log.d(TAG, "attachSurface (changed) gen=$gen")
-            MPVLib.attachSurface(surface)
-            pendingAttachSurface = null
-        }
+        MPVLib.setPropertyString("android-surface-size", "${width}x${height}")
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         Log.d(TAG, "surfaceDestroyed")
         attachedSurface = null
-        mainHandler.post { onSurfaceDestroyed?.invoke() }
+        // Disable VO first so mpv stops rendering before we detach.
+        // This matches BaseMPVView from mpv-android and avoids a race
+        // where mpv tries to write to the surface after it is gone.
+        executor.execute {
+            MPVLib.setPropertyString("vo", "null")
+            MPVLib.setPropertyString("force-window", "no")
+        }
         executor.detachSurface()
     }
 }

@@ -34,10 +34,6 @@ class PlayerViewModel(
 
     private var pendingFileUri: Uri? = null
 
-    // Surface recovery state
-    private var lastPlayedUri: Uri? = null
-    private var lastPosition: Double = 0.0
-    @Volatile var surfaceWasLost = false
 
     val controller = MpvController(context)
 
@@ -61,11 +57,7 @@ class PlayerViewModel(
         controller.dispatcher.addListener(this)
         controller.init()
         controller.surface.onSurfaceReady = {
-            if (surfaceWasLost) {
-                onSurfaceRecovered()
-            } else {
-                onSurfaceReady()
-            }
+            onSurfaceReady()
         }
 
         // Collect preferred subtitle language from DataStore.
@@ -129,9 +121,6 @@ class PlayerViewModel(
         } catch (e: SecurityException) {
             // Permission may already be held or not grantable; proceed anyway
         }
-        // Track the last-played URI for VO recovery after lock
-        lastPlayedUri = uri
-        surfaceWasLost = false
         // Update playlist state so currentUri reflects the new file immediately.
         // If the URI is already in the list, jump to it; otherwise append and jump.
         _playlistState.update { current ->
@@ -156,28 +145,15 @@ class PlayerViewModel(
     }
 
     fun onSurfaceReady() {
-        val uri = pendingFileUri ?: return
-        pendingFileUri = null
-        controller.executor.loadFile(resolveUri(uri))
-    }
-
-    /**
-     * Called when the surface is re-created after a fatal VO loss (e.g. phone lock).
-     * Reloads the last-played file and seeks back to the saved position.
-     */
-    fun onSurfaceRecovered() {
-        Log.d(TAG, "onSurfaceRecovered: reloading uri=$lastPlayedUri at pos=$lastPosition")
-        surfaceWasLost = false
-        val uri = lastPlayedUri ?: return
-        val savedPosition = lastPosition
-        viewModelScope.launch {
-            delay(500L) // let MPV finish attaching the new surface
-            controller.executor.loadFile(resolveUri(uri))
-            if (savedPosition > 1.0) {
-                delay(800L) // let the file open and buffering start
-                controller.executor.seekAbsolute(savedPosition)
-            }
+        val pending = pendingFileUri
+        if (pending != null) {
+            // First load — surface became ready before loadAndPlay was called
+            pendingFileUri = null
+            controller.executor.loadFile(resolveUri(pending))
         }
+        // If pendingFileUri is null, a file is already loaded in mpv.
+        // attachSurface() already ran — mpv resumes rendering automatically.
+        // Do NOT reload the file here. No seek needed.
     }
 
     /** Pauses playback immediately — used by screen-off receiver. */
@@ -381,13 +357,9 @@ class PlayerViewModel(
 
     override fun onPlaybackStopped(endReason: Int) {
         _playerState.update { it.copy(isPlaying = false) }
-        // MPV_END_FILE_REASON_ERROR = 4. If the surface is also gone, the VO crashed on lock.
-        if ((endReason == 0 || endReason == 4) && !controller.surface.hasSurface() && lastPlayedUri != null) {
-            Log.d(TAG, "VO fatal error while surface is gone — flagging for recovery on next surfaceCreated")
-            surfaceWasLost = true
-        }
-        // Auto-advance: endReason 0 = EOF (natural end). Advance playlist only on natural end.
-        if (endReason == 0 && !surfaceWasLost) {
+        // endReason 0 = natural EOF. Advance playlist only on clean end
+        // AND only when the surface is still alive (not a VO teardown on lock).
+        if (endReason == 0 && controller.surface.hasSurface()) {
             playNext()
         }
     }
@@ -400,7 +372,6 @@ class PlayerViewModel(
             }
             MpvConstants.PROP_TIME_POS -> {
                 val seconds = value as? Double ?: return
-                lastPosition = seconds // track for VO recovery
                 _playerState.update { it.copy(currentPositionMs = (seconds * 1000).toLong()) }
             }
             MpvConstants.PROP_DURATION -> {
