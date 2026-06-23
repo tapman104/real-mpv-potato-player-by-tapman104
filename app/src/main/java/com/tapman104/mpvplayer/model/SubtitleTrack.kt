@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.state
+package com.tapman104.mpvplayer.model
 
 data class SubtitleTrack(
     val id: Int,

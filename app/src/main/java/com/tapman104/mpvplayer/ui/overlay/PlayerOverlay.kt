@@ -17,8 +17,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tapman104.mpvplayer.state.PlayerState
-import com.tapman104.mpvplayer.state.PlaylistState
+import com.tapman104.mpvplayer.model.PlayerState
+import com.tapman104.mpvplayer.model.PlaylistState
 import com.tapman104.mpvplayer.ui.components.PlayerTopBar
 import com.tapman104.mpvplayer.ui.components.PlayerBottomBar
 import com.tapman104.mpvplayer.ui.dialogs.ResumeDialog

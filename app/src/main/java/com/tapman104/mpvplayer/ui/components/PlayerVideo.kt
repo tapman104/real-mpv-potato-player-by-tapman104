@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import com.tapman104.mpvplayer.viewmodel.PlayerViewModel
+import com.tapman104.mpvplayer.ui.viewmodel.PlayerViewModel
 
 @Composable
 fun PlayerVideo(viewModel: PlayerViewModel) {

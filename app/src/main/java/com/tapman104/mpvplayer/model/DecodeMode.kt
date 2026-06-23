@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.state
+package com.tapman104.mpvplayer.model
 
 sealed class DecodeMode(val mpvValue: String) {
     object HW : DecodeMode("mediacodec")

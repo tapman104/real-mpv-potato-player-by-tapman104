@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.viewmodel
+package com.tapman104.mpvplayer.ui.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

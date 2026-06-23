@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.viewinterop.AndroidView
-import com.tapman104.mpvplayer.state.PlayerState
-import com.tapman104.mpvplayer.state.PlaylistState
+import com.tapman104.mpvplayer.model.PlayerState
+import com.tapman104.mpvplayer.model.PlaylistState
 import com.tapman104.mpvplayer.ui.components.GestureOverlay
 import com.tapman104.mpvplayer.ui.overlay.PlayerOverlay
 

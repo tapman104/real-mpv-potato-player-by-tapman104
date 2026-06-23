@@ -19,8 +19,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tapman104.mpvplayer.ui.screens.PlayerScreen
 import com.tapman104.mpvplayer.ui.theme.MpvPlayerTheme
-import com.tapman104.mpvplayer.viewmodel.PlayerViewModel
-import com.tapman104.mpvplayer.viewmodel.PlayerViewModelFactory
+import com.tapman104.mpvplayer.ui.viewmodel.PlayerViewModel
+import com.tapman104.mpvplayer.ui.viewmodel.PlayerViewModelFactory
 
 class PlayerActivity : ComponentActivity() {
 

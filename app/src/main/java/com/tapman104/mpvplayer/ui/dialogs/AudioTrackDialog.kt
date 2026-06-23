@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tapman104.mpvplayer.state.AudioTrack
+import com.tapman104.mpvplayer.model.AudioTrack
 
 @Composable
 fun AudioTrackDialog(

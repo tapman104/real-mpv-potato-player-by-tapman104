@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.viewmodel
+package com.tapman104.mpvplayer.ui.viewmodel
 
 import android.content.Context
 import android.net.Uri
@@ -20,7 +20,7 @@ import com.tapman104.mpvplayer.engine.MpvController
 import com.tapman104.mpvplayer.engine.MpvConstants
 import com.tapman104.mpvplayer.engine.MpvEventListener
 import com.tapman104.mpvplayer.engine.TrackListParser
-import com.tapman104.mpvplayer.state.*
+import com.tapman104.mpvplayer.model.*
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVNode
 

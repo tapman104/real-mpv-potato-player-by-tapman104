@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tapman104.mpvplayer.state.AudioTrack
-import com.tapman104.mpvplayer.state.SubtitleTrack
+import com.tapman104.mpvplayer.model.AudioTrack
+import com.tapman104.mpvplayer.model.SubtitleTrack
 import com.tapman104.mpvplayer.ui.dialogs.AudioTrackDialog
 import com.tapman104.mpvplayer.ui.dialogs.MoreOptionsDialog
 import com.tapman104.mpvplayer.ui.dialogs.PlaybackSpeedDialog

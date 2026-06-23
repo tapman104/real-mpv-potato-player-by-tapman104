@@ -1,8 +1,8 @@
 package com.tapman104.mpvplayer.engine
 
 import `is`.xyz.mpv.MPVNode
-import com.tapman104.mpvplayer.state.AudioTrack
-import com.tapman104.mpvplayer.state.SubtitleTrack
+import com.tapman104.mpvplayer.model.AudioTrack
+import com.tapman104.mpvplayer.model.SubtitleTrack
 
 object TrackListParser {
     fun parseAudioTracks(trackListNode: MPVNode): List<AudioTrack> {
