@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
-import com.tapman104.mpvplayer.ui.screens.HomeScreen
+import com.tapman104.mpvplayer.home.ui.HomeScreen
 import com.tapman104.mpvplayer.ui.theme.MpvPlayerTheme
 
 class MainActivity : ComponentActivity() {
