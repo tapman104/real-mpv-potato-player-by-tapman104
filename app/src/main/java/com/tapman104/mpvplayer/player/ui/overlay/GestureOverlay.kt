@@ -1,5 +1,9 @@
 package com.tapman104.mpvplayer.player.ui.overlay
 
+import android.app.Activity
+import android.content.Context
+import android.media.AudioManager
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -21,11 +25,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationException
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlin.math.roundToInt
 
 @Composable
 fun GestureOverlay(
@@ -39,6 +47,16 @@ fun GestureOverlay(
     var seekLabel by remember { mutableStateOf("") }
     var labelTrigger by remember { mutableIntStateOf(0) }
     var isLongPressing by remember { mutableStateOf(false) }
+    
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
+    
+    var showBrightness by remember { mutableStateOf(false) }
+    var brightnessPercent by remember { mutableIntStateOf(0) }
+    
+    var showVolume by remember { mutableStateOf(false) }
+    var volumePercent by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(labelTrigger) {
         if (labelTrigger > 0) {
@@ -55,32 +73,99 @@ fun GestureOverlay(
                     val firstDown = awaitFirstDown(requireUnconsumed = false)
                     firstDown.consume()
 
-                    val firstUp = withTimeoutOrNull(500L) {
-                        waitForUpOrCancellation()
+                    var isDragging = false
+                    var isLongPressingLocal = false
+                    var firstUp: androidx.compose.ui.input.pointer.PointerInputChange? = null
+
+                    try {
+                        withTimeout(500L) {
+                            while (true) {
+                                val event = awaitPointerEvent(PointerEventPass.Main)
+                                val change = event.changes.first()
+                                if (!change.pressed) {
+                                    firstUp = change
+                                    break
+                                }
+                                val dy = change.position.y - firstDown.position.y
+                                val dx = change.position.x - firstDown.position.x
+                                if (kotlin.math.abs(dy) > 20f && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
+                                    isDragging = true
+                                    break
+                                }
+                            }
+                        }
+                    } catch (e: PointerEventTimeoutCancellationException) {
+                        isLongPressingLocal = true
                     }
 
-                    if (firstUp == null) {
-                        // Long press timeout reached (500ms)
+                    if (isDragging) {
+                        val isRightSide = firstDown.position.x > size.width / 2
+                        var currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+                        val maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
+                        
+                        var currentBrightness = activity?.window?.attributes?.screenBrightness ?: -1f
+                        if (currentBrightness < 0f) {
+                            currentBrightness = try {
+                                Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS) / 255f
+                            } catch (e: Exception) {
+                                0.5f
+                            }
+                        }
+                        
+                        if (isRightSide) {
+                            showVolume = true
+                            volumePercent = ((currentVolume / maxVol) * 100).toInt()
+                        } else {
+                            showBrightness = true
+                            brightnessPercent = (currentBrightness * 100).toInt()
+                        }
+                        
+                        while (true) {
+                            val event = awaitPointerEvent(PointerEventPass.Main)
+                            val change = event.changes.first()
+                            if (!change.pressed) break
+                            
+                            val dy = change.positionChange().y
+                            val fraction = -dy / size.height
+                            
+                            if (isRightSide) {
+                                currentVolume += fraction * maxVol * 1.5f
+                                currentVolume = currentVolume.coerceIn(0f, maxVol)
+                                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume.roundToInt(), 0)
+                                volumePercent = ((currentVolume / maxVol) * 100).toInt()
+                            } else {
+                                currentBrightness += fraction * 1.5f
+                                currentBrightness = currentBrightness.coerceIn(0.01f, 1f)
+                                activity?.window?.attributes = activity?.window?.attributes?.apply {
+                                    screenBrightness = currentBrightness
+                                }
+                                brightnessPercent = (currentBrightness * 100).toInt()
+                            }
+                            change.consume()
+                        }
+                        showVolume = false
+                        showBrightness = false
+                    } else if (isLongPressingLocal) {
                         isLongPressing = true
                         onSpeedOverride(2.0f)
 
-                        // Wait until released
-                        do {
+                        while (true) {
                             val event = awaitPointerEvent(PointerEventPass.Main)
-                            event.changes.forEach { it.consume() }
-                        } while (event.changes.any { it.pressed })
+                            val change = event.changes.first()
+                            change.consume()
+                            if (!change.pressed) break
+                        }
 
                         isLongPressing = false
                         onSpeedRestore()
                     } else {
-                        firstUp.consume()
+                        firstUp?.consume()
 
                         val secondDown = withTimeoutOrNull(300L) {
                             awaitFirstDown(requireUnconsumed = false)
                         }
 
                         if (secondDown == null) {
-                            // No second tap within 300ms window, so it's a single tap
                             onToggleControls()
                         } else {
                             secondDown.consume()
@@ -100,14 +185,15 @@ fun GestureOverlay(
                                 }
                                 labelTrigger++
                             } else {
-                                // They held the second tap for > 500ms -> Long press
                                 isLongPressing = true
                                 onSpeedOverride(2.0f)
                                 
-                                do {
+                                while (true) {
                                     val event = awaitPointerEvent(PointerEventPass.Main)
-                                    event.changes.forEach { it.consume() }
-                                } while (event.changes.any { it.pressed })
+                                    val change = event.changes.first()
+                                    change.consume()
+                                    if (!change.pressed) break
+                                }
                                 
                                 isLongPressing = false
                                 onSpeedRestore()
@@ -131,6 +217,29 @@ fun GestureOverlay(
                     .background(Color.Black.copy(alpha = 0.45f))
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
+        }
+        
+        if (showVolume || showBrightness) {
+            val align = if (showVolume) Alignment.CenterStart else Alignment.CenterEnd
+            val text = if (showVolume) "🔊 $volumePercent%" else "☀️ $brightnessPercent%"
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 48.dp),
+                contentAlignment = align
+            ) {
+                Text(
+                    text = text,
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.Black.copy(alpha = 0.45f))
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
         }
     }
 }
