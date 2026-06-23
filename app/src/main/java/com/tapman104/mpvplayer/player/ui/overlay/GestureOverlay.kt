@@ -2,6 +2,7 @@ package com.tapman104.mpvplayer.player.ui.overlay
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.media.AudioManager
 import android.provider.Settings
 import androidx.compose.foundation.background
@@ -49,7 +50,14 @@ fun GestureOverlay(
     var isLongPressing by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
-    val activity = context as? Activity
+    val activity = remember(context) {
+        var ctx = context
+        while (ctx is ContextWrapper) {
+            if (ctx is Activity) break
+            ctx = ctx.baseContext
+        }
+        ctx as? Activity
+    }
     val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     
     var showBrightness by remember { mutableStateOf(false) }
@@ -71,19 +79,25 @@ fun GestureOverlay(
             .pointerInput(Unit) {
                 awaitEachGesture {
                     val firstDown = awaitFirstDown(requireUnconsumed = false)
+                    if (firstDown.isConsumed) return@awaitEachGesture
                     firstDown.consume()
 
                     var isDragging = false
                     var isLongPressingLocal = false
+                    var isConsumed = false
                     var firstUp: androidx.compose.ui.input.pointer.PointerInputChange? = null
 
                     try {
                         withTimeout(500L) {
                             while (true) {
                                 val event = awaitPointerEvent(PointerEventPass.Main)
-                                val change = event.changes.first()
-                                if (!change.pressed) {
+                                val change = event.changes.firstOrNull { it.id == firstDown.id }
+                                if (change == null || !change.pressed) {
                                     firstUp = change
+                                    break
+                                }
+                                if (change.isConsumed) {
+                                    isConsumed = true
                                     break
                                 }
                                 val dy = change.position.y - firstDown.position.y
@@ -91,12 +105,17 @@ fun GestureOverlay(
                                 if (kotlin.math.abs(dy) > 20f && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
                                     isDragging = true
                                     break
+                                } else if (kotlin.math.abs(dx) > 20f) {
+                                    firstUp = change
+                                    break
                                 }
                             }
                         }
                     } catch (e: PointerEventTimeoutCancellationException) {
                         isLongPressingLocal = true
                     }
+
+                    if (isConsumed) return@awaitEachGesture
 
                     if (isDragging) {
                         val isRightSide = firstDown.position.x > size.width / 2
@@ -122,8 +141,9 @@ fun GestureOverlay(
                         
                         while (true) {
                             val event = awaitPointerEvent(PointerEventPass.Main)
-                            val change = event.changes.first()
-                            if (!change.pressed) break
+                            val change = event.changes.firstOrNull { it.id == firstDown.id }
+                            if (change == null || !change.pressed) break
+                            if (change.isConsumed) break
                             
                             val dy = change.positionChange().y
                             val fraction = -dy / size.height
@@ -151,9 +171,9 @@ fun GestureOverlay(
 
                         while (true) {
                             val event = awaitPointerEvent(PointerEventPass.Main)
-                            val change = event.changes.first()
+                            val change = event.changes.firstOrNull { it.id == firstDown.id }
+                            if (change == null || !change.pressed) break
                             change.consume()
-                            if (!change.pressed) break
                         }
 
                         isLongPressing = false
@@ -168,6 +188,7 @@ fun GestureOverlay(
                         if (secondDown == null) {
                             onToggleControls()
                         } else {
+                            if (secondDown.isConsumed) return@awaitEachGesture
                             secondDown.consume()
                             
                             val secondUp = withTimeoutOrNull(500L) {
@@ -190,9 +211,9 @@ fun GestureOverlay(
                                 
                                 while (true) {
                                     val event = awaitPointerEvent(PointerEventPass.Main)
-                                    val change = event.changes.first()
+                                    val change = event.changes.firstOrNull { it.id == secondDown.id }
+                                    if (change == null || !change.pressed) break
                                     change.consume()
-                                    if (!change.pressed) break
                                 }
                                 
                                 isLongPressing = false
