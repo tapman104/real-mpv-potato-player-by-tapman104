@@ -97,4 +97,22 @@ class MpvController(private val context: Context) {
         // Shutdown AFTER submitting the cleanup task, not inside it
         executor.shutdown()
     }
+
+    /** Called by the Activity onStart — surface has been re-attached,
+     *  kick mpv's video output to resume rendering. */
+    fun onSurfaceRecovered() {
+        if (!initialized) return
+        executor.execute {
+            try {
+                MPVLib.command("video-reload")
+            } catch (_: Throwable) {}
+        }
+    }
+
+    /** Called by the Activity onStop — surface is about to be destroyed,
+     *  tell mpv to drop the video output without destroying the engine. */
+    fun onSurfaceLost() {
+        if (!initialized) return
+        executor.detachSurface()
+    }
 }

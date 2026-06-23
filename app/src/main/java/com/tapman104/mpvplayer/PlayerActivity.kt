@@ -77,6 +77,11 @@ class PlayerActivity : ComponentActivity() {
 
         // Register MpvSurface as the holder callback BEFORE setContent
         surfaceView.holder.addCallback(viewModel.controller.surface)
+        viewModel.controller.surface.onSurfaceDestroyed = {
+            // Ensure mpv knows the surface is gone before SurfaceView
+            // delivers surfaceDestroyed to the holder callback.
+            viewModel.controller.onSurfaceLost()
+        }
 
         setContent {
             MpvPlayerTheme {
@@ -150,6 +155,21 @@ class PlayerActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.data?.let { viewModel.loadAndPlay(it) }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Surface will be destroyed by the system. Detach from mpv
+        // so it does not hold a dead surface reference.
+        viewModel.controller.onSurfaceLost()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Surface will be re-created by SurfaceView shortly. The
+        // surfaceCreated callback in MpvSurface handles re-attachment;
+        // onSurfaceRecovered kicks the vo to emit frames again.
+        viewModel.controller.onSurfaceRecovered()
     }
 
     override fun onDestroy() {

@@ -24,6 +24,7 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
     @Volatile private var pendingAttachSurface: Surface? = null
 
     var onSurfaceReady: (() -> Unit)? = null
+    var onSurfaceDestroyed: (() -> Unit)? = null
 
     fun hasSurface(): Boolean = attachedSurface != null || pendingAttachSurface != null
 
@@ -44,8 +45,7 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
             Log.d(TAG, "attachSurface gen=$gen")
             MPVLib.attachSurface(surface)
             pendingAttachSurface = null
-            // Post onSurfaceReady to the main thread AFTER attachSurface has returned.
-            // This guarantees the GPU context is live before onSurfaceRecovered queues loadFile.
+            try { MPVLib.command("video-reload") } catch (_: Throwable) {}
             mainHandler.post { callback?.invoke() }
         }
     }
@@ -71,8 +71,7 @@ class MpvSurface(private val executor: MpvCommandExecutor) : SurfaceHolder.Callb
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         Log.d(TAG, "surfaceDestroyed")
         attachedSurface = null
-        // Generation-guarded: if surfaceCreated arrives before this task executes,
-        // the generation will have moved forward and this detach will be skipped.
+        mainHandler.post { onSurfaceDestroyed?.invoke() }
         executor.detachSurface()
     }
 }
