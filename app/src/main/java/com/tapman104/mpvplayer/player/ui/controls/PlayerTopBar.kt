@@ -31,7 +31,6 @@ import com.tapman104.mpvplayer.player.ui.dialog.SubtitleTrackDialog
 @Composable
 fun PlayerTopBar(
     fileName: String,
-    speed: Float,
     onBack: () -> Unit,
     onOpenFile: () -> Unit,
     onSpeedChange: (Float) -> Unit,
@@ -80,7 +79,7 @@ fun PlayerTopBar(
 
     if (showSpeedDialog) {
         PlaybackSpeedDialog(
-            currentSpeed = speed,
+            currentSpeed = 1f,
             onSelectSpeed = { onSpeedChange(it); showSpeedDialog = false },
             onDismiss = { showSpeedDialog = false }
         )
@@ -89,7 +88,7 @@ fun PlayerTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(start = 4.dp, end = 4.dp, top = 12.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -117,11 +116,6 @@ fun PlayerTopBar(
                     fontSize = 13.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "${speed}×",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 11.sp
                 )
             }
         }

@@ -19,7 +19,7 @@ fun PlayerBottomBar(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp)
     ) {
         PlayerSeekBar(
             currentPositionMs = currentPositionMs,
@@ -28,7 +28,7 @@ fun PlayerBottomBar(
             onSeek = onSeek,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
         PlayPauseButton(
             isPlaying = isPlaying,
             onToggle = onTogglePlay,

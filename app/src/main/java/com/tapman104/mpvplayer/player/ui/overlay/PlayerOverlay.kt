@@ -77,7 +77,6 @@ fun PlayerOverlay(
         ) {
             PlayerTopBar(
                 fileName = fileName,
-                speed = playerState.speed,
                 onBack = {},
                 onOpenFile = onOpenFile,
                 onSpeedChange = onSpeedChange,

@@ -22,12 +22,15 @@ fun PlayPauseButton(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        IconButton(onClick = onToggle) {
+        IconButton(
+            onClick = onToggle,
+            modifier = Modifier.size(56.dp)
+        ) {
             Icon(
                 imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 tint = Color.White,
-                modifier = Modifier.size(56.dp)
+                modifier = Modifier.size(48.dp)
             )
         }
     }
