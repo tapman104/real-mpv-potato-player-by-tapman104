@@ -1,6 +1,7 @@
 package com.tapman104.mpvplayer.player.ui.overlay
 
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tapman104.mpvplayer.player.state.PlayerState
@@ -22,6 +24,8 @@ import com.tapman104.mpvplayer.player.ui.controls.PlayerBottomBar
 import com.tapman104.mpvplayer.player.ui.dialog.ResumeDialog
 import com.tapman104.mpvplayer.player.ui.dialog.SubtitleAppearanceDialog
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun PlayerOverlay(
@@ -64,9 +68,35 @@ fun PlayerOverlay(
         }
     }
 
-    val fileName = playlistState.currentUri
-        ?.let { Uri.parse(it).lastPathSegment ?: it }
-        ?: "No file loaded"
+    val context = LocalContext.current
+    var fileName by remember(playlistState.currentUri) {
+        mutableStateOf(
+            playlistState.currentUri?.let { Uri.parse(it).lastPathSegment ?: it } ?: "No file loaded"
+        )
+    }
+
+    LaunchedEffect(playlistState.currentUri) {
+        val uriStr = playlistState.currentUri
+        if (uriStr != null) {
+            val uri = Uri.parse(uriStr)
+            if (uri.scheme == "content") {
+                withContext(Dispatchers.IO) {
+                    try {
+                        context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+                            if (cursor.moveToFirst()) {
+                                val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                                if (index != -1) {
+                                    cursor.getString(index)?.let { fileName = it }
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Ignore
+                    }
+                }
+            }
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         AnimatedVisibility(

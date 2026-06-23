@@ -92,7 +92,7 @@ fun PlayerTopBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Left column: back arrow + filename + speed indicator
+        // Left column: back arrow + filename
         Row(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
