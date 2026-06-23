@@ -52,9 +52,10 @@ fun PlayerOverlay(
     modifier: Modifier = Modifier
 ) {
     var showSubtitleAppearance by remember { mutableStateOf(false) }
+    var isDraggingSeekbar by remember { mutableStateOf(false) }
 
-    LaunchedEffect(controlsVisible) {
-        if (controlsVisible) {
+    LaunchedEffect(controlsVisible, isDraggingSeekbar) {
+        if (controlsVisible && !isDraggingSeekbar) {
             delay(3000L)
             onControlsVisibilityChange(false)
         }
@@ -131,7 +132,8 @@ fun PlayerOverlay(
                 demuxerCacheTimeMs = playerState.demuxerCacheTimeMs,
                 isPlaying = playerState.isPlaying,
                 onSeek = onSeek,
-                onTogglePlay = onTogglePlay
+                onTogglePlay = onTogglePlay,
+                onDraggingChange = { isDraggingSeekbar = it }
             )
         }
 

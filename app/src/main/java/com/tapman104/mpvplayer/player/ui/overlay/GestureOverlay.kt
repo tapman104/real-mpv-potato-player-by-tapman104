@@ -172,7 +172,10 @@ fun GestureOverlay(
                         while (true) {
                             val event = awaitPointerEvent(PointerEventPass.Main)
                             val change = event.changes.firstOrNull { it.id == firstDown.id }
-                            if (change == null || !change.pressed) break
+                            if (change == null || !change.pressed) {
+                                change?.consume()
+                                break
+                            }
                             change.consume()
                         }
 
@@ -212,7 +215,10 @@ fun GestureOverlay(
                                 while (true) {
                                     val event = awaitPointerEvent(PointerEventPass.Main)
                                     val change = event.changes.firstOrNull { it.id == secondDown.id }
-                                    if (change == null || !change.pressed) break
+                                    if (change == null || !change.pressed) {
+                                        change?.consume()
+                                        break
+                                    }
                                     change.consume()
                                 }
                                 

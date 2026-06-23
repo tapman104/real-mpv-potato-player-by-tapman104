@@ -17,6 +17,7 @@ fun PlayerSeekBar(
     durationMs: Long,
     demuxerCacheTimeMs: Long,
     onSeek: (Long) -> Unit,
+    onDraggingChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var isDragging by remember { mutableStateOf(false) }
@@ -35,12 +36,14 @@ fun PlayerSeekBar(
             Slider(
                 value = fraction,
                 onValueChange = {
+                    if (!isDragging) onDraggingChange(true)
                     isDragging = true
                     dragPositionMs = (it * durationMs).toLong()
                 },
                 onValueChangeFinished = {
                     onSeek(dragPositionMs)
                     isDragging = false
+                    onDraggingChange(false)
                 },
                 colors = SliderDefaults.colors(
                     thumbColor = Color.White,

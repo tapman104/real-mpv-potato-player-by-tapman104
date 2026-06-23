@@ -86,6 +86,7 @@ class PlayerActivity : ComponentActivity() {
                 // Hoist resume dialog state into Compose
                 var showResume by remember { mutableStateOf(false) }
                 var resumeMs by remember { mutableStateOf(0L) }
+                var preOverrideSpeed by remember { mutableFloatStateOf(1f) }
 
                 // Save position whenever playback pauses (isPlaying flips to false)
                 val isPlaying = playerState.isPlaying
@@ -116,8 +117,11 @@ class PlayerActivity : ComponentActivity() {
                     onSeekRelative = { viewModel.seekRelative(it) },
                     onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) },
                     onSpeedChange = { viewModel.setSpeed(it) },
-                    onSpeedOverride = { viewModel.setSpeed(it) },
-                    onSpeedRestore = { viewModel.setSpeed(playerState.speed) },
+                    onSpeedOverride = { 
+                        preOverrideSpeed = playerState.speed
+                        viewModel.setSpeed(it) 
+                    },
+                    onSpeedRestore = { viewModel.setSpeed(preOverrideSpeed) },
                     onSelectAudioTrack = { viewModel.setAudioTrack(it) },
                     onSelectSubtitleTrack = { viewModel.setSubtitleTrack(it) },
                     onSubtitleAppearance = { size, position ->

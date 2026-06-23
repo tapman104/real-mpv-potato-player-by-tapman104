@@ -14,6 +14,7 @@ fun PlayerBottomBar(
     isPlaying: Boolean,
     onSeek: (Long) -> Unit,
     onTogglePlay: () -> Unit,
+    onDraggingChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -27,6 +28,7 @@ fun PlayerBottomBar(
             durationMs = durationMs,
             demuxerCacheTimeMs = demuxerCacheTimeMs,
             onSeek = onSeek,
+            onDraggingChange = onDraggingChange,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(4.dp))

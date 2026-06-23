@@ -300,10 +300,13 @@ class PlayerViewModel(
      */
     fun saveCurrentPosition(filePath: String, positionMs: Long) {
         viewModelScope.launch {
-            if (positionMs > 5000L) {
+            val duration = _playerState.value.durationMs
+            if (positionMs > 5000L && (duration == 0L || positionMs < duration - 5000L)) {
                 resumePositionDao.savePosition(
                     ResumePositionEntity(filePath = filePath, positionMs = positionMs)
                 )
+            } else if (duration > 0L && positionMs >= duration - 5000L) {
+                resumePositionDao.deletePosition(filePath)
             }
         }
     }
