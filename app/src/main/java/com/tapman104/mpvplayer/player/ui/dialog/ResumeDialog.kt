@@ -1,6 +1,5 @@
 package com.tapman104.mpvplayer.player.ui.dialog
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -8,9 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun ResumeDialog(
@@ -21,19 +17,17 @@ fun ResumeDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1E1E1E),
         title = {
             Text(
                 text = "Resume Playback",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                color = Color.White
             )
         },
         text = {
             Text(
                 text = "Resume from ${formatResumeMs(resumePositionMs)}?",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 16.sp
+                color = Color.White.copy(alpha = 0.87f)
             )
         },
         confirmButton = {
@@ -43,11 +37,10 @@ fun ResumeDialog(
                     onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFB300)
-                ),
-                shape = RoundedCornerShape(8.dp)
+                    containerColor = Color(0xFF8B5CF6)
+                )
             ) {
-                Text("Resume", color = Color(0xFF1E1E1E), fontWeight = FontWeight.Bold)
+                Text("Resume", color = Color.White)
             }
         },
         dismissButton = {
@@ -57,12 +50,9 @@ fun ResumeDialog(
                     onDismiss()
                 }
             ) {
-                Text("Start Over", color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.SemiBold)
+                Text("Start Over", color = Color.White.copy(alpha = 0.7f))
             }
-        },
-        containerColor = Color(0xFF1E1E1E),
-        shape = RoundedCornerShape(20.dp),
-        tonalElevation = 8.dp
+        }
     )
 }
 

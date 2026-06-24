@@ -1,18 +1,15 @@
 package com.tapman104.mpvplayer.player.ui.dialog
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,29 +25,25 @@ fun AudioTrackDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close", color = Color.White)
+            }
+        },
+        containerColor = Color(0xFF1E1E1E),
         title = {
-            Text(
-                text = "Audio Track",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Text("Audio Track", color = Color.White, fontWeight = FontWeight.Bold)
         },
         text = {
             if (tracks.isEmpty()) {
                 Text(
                     text = "No audio tracks available",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(vertical = 16.dp)
+                    color = Color.Gray,
+                    fontSize = 14.sp
                 )
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(vertical = 4.dp)
-                ) {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     items(tracks) { track ->
                         TrackRow(
                             title = track.title,
@@ -61,19 +54,11 @@ fun AudioTrackDialog(
                                 onDismiss()
                             }
                         )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 0.5.dp)
                     }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close", color = Color(0xFFFFB300), fontWeight = FontWeight.SemiBold)
-            }
-        },
-        dismissButton = {},
-        containerColor = Color(0xFF1E1E1E),
-        shape = RoundedCornerShape(20.dp),
-        tonalElevation = 8.dp
+        }
     )
 }
 
@@ -84,41 +69,33 @@ private fun TrackRow(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFFFFB300).copy(alpha = 0.15f) else Color(0xFF2A2A2A)
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(backgroundColor)
             .clickable(onClick = onClick)
-            .padding(vertical = 14.dp, horizontal = 16.dp),
+            .padding(vertical = 10.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = title.ifEmpty { "Track" },
-                color = if (isSelected) Color(0xFFFFB300) else Color.White,
-                fontSize = 16.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                text = title,
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )
-            if (lang.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "[$lang]",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 13.sp
-                )
-            }
+            Text(
+                text = "[$lang]",
+                color = Color.Gray,
+                fontSize = 12.sp
+            )
         }
         if (isSelected) {
-            Spacer(modifier = Modifier.width(12.dp))
             Icon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = null,
-                tint = Color(0xFFFFB300),
-                modifier = Modifier.size(20.dp)
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
             )
         }
     }
