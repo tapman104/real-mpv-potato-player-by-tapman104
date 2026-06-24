@@ -1,7 +1,10 @@
 package com.tapman104.mpvplayer.player.ui.controls
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Audiotrack
@@ -11,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tapman104.mpvplayer.player.model.AudioTrack
+import com.tapman104.mpvplayer.player.model.DecodeMode
 import com.tapman104.mpvplayer.player.model.SubtitleTrack
 import com.tapman104.mpvplayer.player.ui.dialog.AudioTrackDialog
 import com.tapman104.mpvplayer.player.ui.dialog.MoreOptionsDialog
@@ -43,12 +48,22 @@ fun PlayerTopBar(
     selectedSubtitleTrackId: Int,
     onSelectAudioTrack: (Int) -> Unit,
     onSelectSubtitleTrack: (Int) -> Unit,
+    onSubtitleAppearanceClick: () -> Unit = {},
+    currentDecodeMode: DecodeMode = DecodeMode.HWPlus,
+    onDecodeModeChange: (DecodeMode) -> Unit = {},
+    onDialogOpenChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showAudioDialog by remember { mutableStateOf(false) }
     var showSubtitleDialog by remember { mutableStateOf(false) }
     var showMoreOptionsDialog by remember { mutableStateOf(false) }
     var showSpeedDialog by remember { mutableStateOf(false) }
+
+    val isAnyDialogOpen = showAudioDialog || showSubtitleDialog || showMoreOptionsDialog || showSpeedDialog
+
+    LaunchedEffect(isAnyDialogOpen) {
+        onDialogOpenChange(isAnyDialogOpen)
+    }
 
     if (showAudioDialog) {
         AudioTrackDialog(
@@ -66,7 +81,10 @@ fun PlayerTopBar(
             onSelectTrack = onSelectSubtitleTrack,
             onDisableSubtitles = { onSelectSubtitleTrack(-1) },
             onDismiss = { showSubtitleDialog = false },
-            onAppearanceClick = { showSubtitleDialog = false }
+            onAppearanceClick = { 
+                showSubtitleDialog = false
+                onSubtitleAppearanceClick()
+            }
         )
     }
 
@@ -127,7 +145,7 @@ fun PlayerTopBar(
             )
         }
 
-        // Right side: Audio, Subtitle, FolderOpen, MoreVert
+        // Right side: Audio, Subtitle, DecodeMode, MoreVert
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = { showAudioDialog = true },
@@ -151,6 +169,45 @@ fun PlayerTopBar(
                     modifier = Modifier.size(28.dp)
                 )
             }
+
+            // Decode mode cycle button: SW → HW → HW+ → SW …
+            val decodeModeLabel = when (currentDecodeMode) {
+                DecodeMode.SW     -> "SW"
+                DecodeMode.HW     -> "HW"
+                DecodeMode.HWPlus -> "HW+"
+                else              -> "HW+"
+            }
+            val nextDecodeMode = when (currentDecodeMode) {
+                DecodeMode.SW     -> DecodeMode.HW
+                DecodeMode.HW     -> DecodeMode.HWPlus
+                DecodeMode.HWPlus -> DecodeMode.SW
+                else              -> DecodeMode.HW
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clickable { onDecodeModeChange(nextDecodeMode) }
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .border(
+                            width = 1.5.dp,
+                            color = Color.White.copy(alpha = 0.85f),
+                            shape = RoundedCornerShape(6.dp)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = decodeModeLabel,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
             IconButton(
                 onClick = { showMoreOptionsDialog = true },
                 modifier = Modifier.size(48.dp)

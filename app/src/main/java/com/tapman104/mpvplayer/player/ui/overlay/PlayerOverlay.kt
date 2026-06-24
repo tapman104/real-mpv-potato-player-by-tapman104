@@ -53,9 +53,12 @@ fun PlayerOverlay(
 ) {
     var showSubtitleAppearance by remember { mutableStateOf(false) }
     var isDraggingSeekbar by remember { mutableStateOf(false) }
+    var isTopBarDialogOpen by remember { mutableStateOf(false) }
 
-    LaunchedEffect(controlsVisible, isDraggingSeekbar) {
-        if (controlsVisible && !isDraggingSeekbar) {
+    val isAnyDialogOpen = isTopBarDialogOpen || showSubtitleAppearance || showResumeDialog
+
+    LaunchedEffect(controlsVisible, isDraggingSeekbar, isAnyDialogOpen) {
+        if (controlsVisible && !isDraggingSeekbar && !isAnyDialogOpen) {
             delay(3000L)
             onControlsVisibilityChange(false)
         }
@@ -117,6 +120,8 @@ fun PlayerOverlay(
                 selectedSubtitleTrackId = playerState.selectedSubtitleTrackId,
                 onSelectAudioTrack = onSelectAudioTrack,
                 onSelectSubtitleTrack = onSelectSubtitleTrack,
+                onSubtitleAppearanceClick = { showSubtitleAppearance = true },
+                onDialogOpenChange = { isTopBarDialogOpen = it }
             )
         }
 
