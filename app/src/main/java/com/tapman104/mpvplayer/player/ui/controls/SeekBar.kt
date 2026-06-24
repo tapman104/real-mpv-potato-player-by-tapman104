@@ -28,7 +28,18 @@ fun PlayerSeekBar(
 
     // TODO: cache bar — demuxerCacheTimeMs is kept but not rendered visually yet
 
-    Column(modifier = modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = formatMs(displayPositionMs),
+            color = Color.White,
+            fontSize = 13.sp,
+            modifier = Modifier.widthIn(min = 48.dp),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Start
+        )
+        Spacer(Modifier.width(8.dp))
         Slider(
             value = fraction,
             onValueChange = {
@@ -46,24 +57,16 @@ fun PlayerSeekBar(
                 activeTrackColor = Color.White,
                 inactiveTrackColor = Color.White.copy(alpha = 0.3f)
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.weight(1f)
         )
-        Spacer(Modifier.height(2.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = formatMs(displayPositionMs),
-                color = Color.White,
-                fontSize = 13.sp
-            )
-            Text(
-                text = formatMs(durationMs),
-                color = Color.White,
-                fontSize = 13.sp
-            )
-        }
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = formatMs(durationMs),
+            color = Color.White,
+            fontSize = 13.sp,
+            modifier = Modifier.widthIn(min = 48.dp),
+            textAlign = androidx.compose.ui.text.style.TextAlign.End
+        )
     }
 }
 

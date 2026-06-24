@@ -21,7 +21,7 @@ fun PlayerBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
         PlayerSeekBar(
             currentPositionMs = currentPositionMs,
