@@ -29,30 +29,25 @@ fun PlayerSeekBar(
     // TODO: cache bar — demuxerCacheTimeMs is kept but not rendered visually yet
 
     Column(modifier = modifier) {
-        Box(
-            modifier = Modifier.fillMaxWidth().height(24.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Slider(
-                value = fraction,
-                onValueChange = {
-                    if (!isDragging) onDraggingChange(true)
-                    isDragging = true
-                    dragPositionMs = (it * durationMs).toLong()
-                },
-                onValueChangeFinished = {
-                    onSeek(dragPositionMs)
-                    isDragging = false
-                    onDraggingChange(false)
-                },
-                colors = SliderDefaults.colors(
-                    thumbColor = Color.White,
-                    activeTrackColor = Color.White,
-                    inactiveTrackColor = Color.White.copy(alpha = 0.3f)
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        Slider(
+            value = fraction,
+            onValueChange = {
+                if (!isDragging) onDraggingChange(true)
+                isDragging = true
+                dragPositionMs = (it * durationMs).toLong()
+            },
+            onValueChangeFinished = {
+                onSeek(dragPositionMs)
+                isDragging = false
+                onDraggingChange(false)
+            },
+            colors = SliderDefaults.colors(
+                thumbColor = Color.White,
+                activeTrackColor = Color.White,
+                inactiveTrackColor = Color.White.copy(alpha = 0.3f)
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
         Spacer(Modifier.height(2.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),

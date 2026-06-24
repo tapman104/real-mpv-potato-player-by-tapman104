@@ -31,7 +31,7 @@ fun PlayerBottomBar(
             onDraggingChange = onDraggingChange,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(8.dp))
         PlayPauseButton(
             isPlaying = isPlaying,
             onToggle = onTogglePlay,

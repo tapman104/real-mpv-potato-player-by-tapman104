@@ -88,7 +88,8 @@ fun PlayerTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp, top = 24.dp, bottom = 8.dp),
+            .statusBarsPadding()
+            .padding(start = 4.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -109,15 +110,13 @@ fun PlayerTopBar(
                 )
             }
             Spacer(Modifier.width(4.dp))
-            Column {
-                Text(
-                    text = fileName,
-                    color = Color.White,
-                    fontSize = 13.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            Text(
+                text = fileName,
+                color = Color.White,
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
         // Right side: Audio, Subtitle, FolderOpen, MoreVert
