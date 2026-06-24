@@ -31,6 +31,7 @@ import com.tapman104.mpvplayer.player.model.AudioTrack
 import com.tapman104.mpvplayer.player.model.DecodeMode
 import com.tapman104.mpvplayer.player.model.SubtitleTrack
 import com.tapman104.mpvplayer.player.ui.dialog.AudioTrackDialog
+import com.tapman104.mpvplayer.player.ui.dialog.DecodeModeDialog
 import com.tapman104.mpvplayer.player.ui.dialog.MoreOptionsDialog
 import com.tapman104.mpvplayer.player.ui.dialog.PlaybackSpeedDialog
 import com.tapman104.mpvplayer.player.ui.dialog.SubtitleTrackDialog
@@ -58,8 +59,9 @@ fun PlayerTopBar(
     var showSubtitleDialog by remember { mutableStateOf(false) }
     var showMoreOptionsDialog by remember { mutableStateOf(false) }
     var showSpeedDialog by remember { mutableStateOf(false) }
+    var showDecodeModeDialog by remember { mutableStateOf(false) }
 
-    val isAnyDialogOpen = showAudioDialog || showSubtitleDialog || showMoreOptionsDialog || showSpeedDialog
+    val isAnyDialogOpen = showAudioDialog || showSubtitleDialog || showMoreOptionsDialog || showSpeedDialog || showDecodeModeDialog
 
     LaunchedEffect(isAnyDialogOpen) {
         onDialogOpenChange(isAnyDialogOpen)
@@ -103,6 +105,14 @@ fun PlayerTopBar(
             currentSpeed = 1f,
             onSelectSpeed = { onSpeedChange(it); showSpeedDialog = false },
             onDismiss = { showSpeedDialog = false }
+        )
+    }
+
+    if (showDecodeModeDialog) {
+        DecodeModeDialog(
+            currentDecodeMode = currentDecodeMode,
+            onSelectMode = onDecodeModeChange,
+            onDismiss = { showDecodeModeDialog = false }
         )
     }
 
@@ -170,24 +180,18 @@ fun PlayerTopBar(
                 )
             }
 
-            // Decode mode cycle button: SW → HW → HW+ → SW …
+            // Decode mode button
             val decodeModeLabel = when (currentDecodeMode) {
                 DecodeMode.SW     -> "SW"
                 DecodeMode.HW     -> "HW"
                 DecodeMode.HWPlus -> "HW+"
                 else              -> "HW+"
             }
-            val nextDecodeMode = when (currentDecodeMode) {
-                DecodeMode.SW     -> DecodeMode.HW
-                DecodeMode.HW     -> DecodeMode.HWPlus
-                DecodeMode.HWPlus -> DecodeMode.SW
-                else              -> DecodeMode.HW
-            }
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(48.dp)
-                    .clickable { onDecodeModeChange(nextDecodeMode) }
+                    .clickable { showDecodeModeDialog = true }
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
