@@ -1,15 +1,19 @@
 package com.tapman104.mpvplayer.player.ui.dialog
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,12 +32,14 @@ fun AudioTrackDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close", color = Color.White)
+                Text("Close", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
             }
         },
-        containerColor = Color(0xFF1E1E1E),
+        containerColor = Color(0xFF1A1A1A),
+        shape = RoundedCornerShape(20.dp),
+        tonalElevation = 0.dp,
         title = {
-            Text("Audio Track", color = Color.White, fontWeight = FontWeight.Bold)
+            Text("Audio Track", color = Color.White, fontWeight = FontWeight.Medium, fontSize = 17.sp)
         },
         text = {
             if (tracks.isEmpty()) {
@@ -44,17 +50,31 @@ fun AudioTrackDialog(
                 )
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(tracks) { track ->
-                        TrackRow(
-                            title = track.title,
-                            lang = track.lang,
-                            isSelected = track.id == selectedTrackId,
-                            onClick = {
-                                onSelectTrack(track.id)
-                                onDismiss()
-                            }
-                        )
-                        HorizontalDivider(color = Color.White.copy(alpha = 0.1f), thickness = 0.5.dp)
+                    itemsIndexed(tracks) { index, track ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .drawBehind {
+                                    if (index < tracks.lastIndex) {
+                                        drawLine(
+                                            color = Color.White.copy(alpha = 0.06f),
+                                            start = Offset(0f, size.height),
+                                            end = Offset(size.width, size.height),
+                                            strokeWidth = 0.5.dp.toPx()
+                                        )
+                                    }
+                                }
+                        ) {
+                            TrackRow(
+                                title = track.title,
+                                lang = track.lang,
+                                isSelected = track.id == selectedTrackId,
+                                onClick = {
+                                    onSelectTrack(track.id)
+                                    onDismiss()
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -80,23 +100,30 @@ private fun TrackRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                color = Color.White,
+                color = if (isSelected) Color(0xFFFFB300) else Color.White,
                 fontSize = 14.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
             )
             Text(
                 text = "[$lang]",
-                color = Color.Gray,
+                color = Color.White.copy(alpha = 0.4f),
                 fontSize = 12.sp
             )
         }
-        if (isSelected) {
-            Icon(
-                imageVector = Icons.Filled.Check,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(18.dp)
-            )
+        Box(
+            modifier = Modifier
+                .size(18.dp)
+                .border(1.5.dp, Color.White.copy(alpha = 0.25f), CircleShape)
+                .background(if (isSelected) Color(0xFFFFB300) else Color.Transparent, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(Color.White, CircleShape)
+                )
+            }
         }
     }
 }
