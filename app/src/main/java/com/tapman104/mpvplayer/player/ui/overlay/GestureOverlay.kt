@@ -230,9 +230,9 @@ fun GestureOverlay(
                             isLongPressing = false
                             onSpeedRestore()
                         } else {
-                            if (!horizontalExitDetected) {
-                                firstUp?.consume()
-                            }
+                            if (horizontalExitDetected) return@awaitEachGesture
+                            
+                            firstUp?.consume()
 
                             val secondDown = withTimeoutOrNull(300L) {
                                 awaitFirstDown(requireUnconsumed = false)

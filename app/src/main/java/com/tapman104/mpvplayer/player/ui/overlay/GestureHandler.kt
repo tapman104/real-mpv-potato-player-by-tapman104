@@ -187,9 +187,10 @@ fun Modifier.panGesture(
     val currentPanXState = rememberUpdatedState(currentPanX)
     val currentPanYState = rememberUpdatedState(currentPanY)
     return this.pointerInput(isEnabled, isVerticalGestureActive) {
-        if (!isEnabled || isVerticalGestureActive || currentZoomState.value <= 0f) return@pointerInput
+        if (!isEnabled || isVerticalGestureActive) return@pointerInput
         awaitEachGesture {
             val firstDown = awaitFirstDown(requireUnconsumed = false)
+            if (currentZoomState.value <= 0f) return@awaitEachGesture
             val startX = firstDown.position.x
             val startY = firstDown.position.y
 
