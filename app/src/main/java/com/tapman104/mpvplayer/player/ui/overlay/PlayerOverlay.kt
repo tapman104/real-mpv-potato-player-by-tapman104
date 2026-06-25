@@ -21,7 +21,6 @@ import com.tapman104.mpvplayer.player.state.PlayerState
 import com.tapman104.mpvplayer.player.state.PlaylistState
 import com.tapman104.mpvplayer.player.ui.controls.PlayerTopBar
 import com.tapman104.mpvplayer.player.ui.controls.PlayerBottomBar
-import com.tapman104.mpvplayer.player.ui.dialog.ResumeDialog
 import com.tapman104.mpvplayer.player.ui.dialog.SubtitleAppearanceDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
@@ -41,12 +40,6 @@ fun PlayerOverlay(
     onSelectSubtitleTrack: (Int) -> Unit,
     onSubtitleAppearance: (size: Float, position: Float) -> Unit,
     onSubtitleReset: () -> Unit,
-    // Resume dialog
-    showResumeDialog: Boolean = false,
-    resumePositionMs: Long = 0L,
-    onResume: () -> Unit = {},
-    onStartOver: () -> Unit = {},
-    onDismissResume: () -> Unit = {},
     // Auto-subtitle
     onAutoSelectSubtitle: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -55,7 +48,7 @@ fun PlayerOverlay(
     var isDraggingSeekbar by remember { mutableStateOf(false) }
     var isTopBarDialogOpen by remember { mutableStateOf(false) }
 
-    val isAnyDialogOpen = isTopBarDialogOpen || showSubtitleAppearance || showResumeDialog
+    val isAnyDialogOpen = isTopBarDialogOpen || showSubtitleAppearance
 
     LaunchedEffect(controlsVisible, isDraggingSeekbar, isAnyDialogOpen) {
         if (controlsVisible && !isDraggingSeekbar && !isAnyDialogOpen) {
@@ -176,14 +169,6 @@ fun PlayerOverlay(
             )
         }
 
-        if (showResumeDialog && resumePositionMs > 5000L) {
-            ResumeDialog(
-                resumePositionMs = resumePositionMs,
-                onResume = onResume,
-                onStartOver = onStartOver,
-                onDismiss = onDismissResume
-            )
-        }
     }
 }
 

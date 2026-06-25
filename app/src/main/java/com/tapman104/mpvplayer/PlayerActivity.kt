@@ -128,17 +128,6 @@ class PlayerActivity : ComponentActivity() {
                         viewModel.setSubtitleAppearance(size, position)
                     },
                     onSubtitleReset = { viewModel.resetSubtitleAppearance() },
-                    // Resume dialog
-                    showResumeDialog = showResume,
-                    resumePositionMs = resumeMs,
-                    onResume = {
-                        viewModel.seekTo(resumeMs)
-                    },
-                    onStartOver = {
-                        currentFilePath?.let { viewModel.clearResumePosition(it) }
-                        viewModel.seekTo(0L)
-                    },
-                    onDismissResume = { showResume = false },
                     // Auto-subtitle
                     onAutoSelectSubtitle = {
                         viewModel.autoSelectSubtitle(playerState.subtitleTracks)
