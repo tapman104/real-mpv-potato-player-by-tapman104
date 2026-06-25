@@ -216,6 +216,20 @@ class PlayerViewModel(
     }
 
     // ---------------------------------------------------------------------------
+    // Zoom / Pan
+    // ---------------------------------------------------------------------------
+
+    fun setVideoZoom(zoom: Float) {
+        controller.executor.setVideoZoom(zoom)
+        _playerState.update { it.copy(videoZoom = zoom) }
+    }
+
+    fun setVideoPan(panX: Float, panY: Float) {
+        controller.executor.setVideoPan(panX, panY)
+        _playerState.update { it.copy(videoPanX = panX, videoPanY = panY) }
+    }
+
+    // ---------------------------------------------------------------------------
     // Subtitle appearance
     // ---------------------------------------------------------------------------
 

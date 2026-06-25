@@ -20,4 +20,7 @@ data class PlayerState(
     val error: String? = null,
     val subtitleSize: Float = 1.1f,
     val subtitlePosition: Float = 0.07f,
+    val videoZoom: Float = 0f,      // MPV video-zoom range: -1f to 3f
+    val videoPanX: Float = 0f,      // MPV video-pan-x
+    val videoPanY: Float = 0f,      // MPV video-pan-y
 )

@@ -131,7 +131,10 @@ class PlayerActivity : ComponentActivity() {
                     // Auto-subtitle
                     onAutoSelectSubtitle = {
                         viewModel.autoSelectSubtitle(playerState.subtitleTracks)
-                    }
+                    },
+                    // Zoom / pan
+                    onZoomChange = { viewModel.setVideoZoom(it) },
+                    onPanChange = { x, y -> viewModel.setVideoPan(x, y) }
                 )
             }
         }

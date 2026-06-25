@@ -35,6 +35,9 @@ fun PlayerScreen(
     onSubtitleReset: () -> Unit = {},
     // Auto-subtitle
     onAutoSelectSubtitle: () -> Unit = {},
+    // Zoom / pan
+    onZoomChange: (Float) -> Unit = {},
+    onPanChange: (Float, Float) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
@@ -66,6 +69,18 @@ fun PlayerScreen(
             onSpeedOverride = onSpeedOverride,
             onSpeedRestore = onSpeedRestore,
             onToggleControls = { controlsVisible = !controlsVisible },
+            // Seek scrub
+            currentPositionMs = playerState.currentPositionMs,
+            durationMs = playerState.durationMs,
+            onSeekTo = onSeek,
+            onPauseForSeek = {},    // keep playing during scrub for responsiveness
+            onResumeAfterSeek = {}, // no-op; seek is live
+            // Zoom / Pan
+            currentZoom = playerState.videoZoom,
+            currentPanX = playerState.videoPanX,
+            currentPanY = playerState.videoPanY,
+            onZoomChange = onZoomChange,
+            onPanChange = onPanChange,
             modifier = Modifier.fillMaxSize()
         )
 

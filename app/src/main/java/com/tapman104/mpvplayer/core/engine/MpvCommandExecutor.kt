@@ -131,6 +131,17 @@ class MpvCommandExecutor {
         }
     }
 
+    fun setVideoZoom(zoom: Float) {
+        execute { MPVLib.setPropertyDouble("video-zoom", zoom.toDouble()) }
+    }
+
+    fun setVideoPan(panX: Float, panY: Float) {
+        execute {
+            MPVLib.setPropertyDouble("video-pan-x", panX.toDouble())
+            MPVLib.setPropertyDouble("video-pan-y", panY.toDouble())
+        }
+    }
+
     fun shutdown() {
         executor.shutdown()
     }
