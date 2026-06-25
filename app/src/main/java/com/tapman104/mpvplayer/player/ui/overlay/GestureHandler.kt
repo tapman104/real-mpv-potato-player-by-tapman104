@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.abs
@@ -41,10 +42,10 @@ fun Modifier.horizontalSeekGesture(
     onSeekLabel: (current: String, delta: String) -> Unit,
     onSeekLabelClear: () -> Unit,
     sensitivityPx: Float = -1f,
-): Modifier {
+): Modifier = composed {
     val currentPositionMsState = rememberUpdatedState(currentPositionMs)
     val durationMsState = rememberUpdatedState(durationMs)
-    return this.pointerInput(isEnabled, isVerticalGestureActive) {
+    pointerInput(isEnabled, isVerticalGestureActive) {
         if (!isEnabled || isVerticalGestureActive) return@pointerInput
         awaitEachGesture {
             val firstDown = awaitFirstDown(requireUnconsumed = false)
@@ -116,9 +117,9 @@ fun Modifier.pinchToZoomGesture(
     onZoomChange: (Float) -> Unit,
     onZoomLabel: () -> Unit,
     onZoomLabelClear: () -> Unit,
-): Modifier {
+): Modifier = composed {
     val currentZoomState = rememberUpdatedState(currentZoom)
-    return this.pointerInput(isEnabled, isVerticalGestureActive) {
+    pointerInput(isEnabled, isVerticalGestureActive) {
         if (!isEnabled || isVerticalGestureActive) return@pointerInput
         awaitEachGesture {
             // Wait for first finger
@@ -182,11 +183,11 @@ fun Modifier.panGesture(
     videoDisplayWidth: Float,
     videoDisplayHeight: Float,
     onPanChange: (Float, Float) -> Unit,
-): Modifier {
+): Modifier = composed {
     val currentZoomState = rememberUpdatedState(currentZoom)
     val currentPanXState = rememberUpdatedState(currentPanX)
     val currentPanYState = rememberUpdatedState(currentPanY)
-    return this.pointerInput(isEnabled, isVerticalGestureActive) {
+    pointerInput(isEnabled, isVerticalGestureActive) {
         if (!isEnabled || isVerticalGestureActive) return@pointerInput
         awaitEachGesture {
             val firstDown = awaitFirstDown(requireUnconsumed = false)
