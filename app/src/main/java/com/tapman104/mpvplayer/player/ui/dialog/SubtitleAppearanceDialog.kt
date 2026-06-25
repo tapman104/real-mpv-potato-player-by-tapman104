@@ -1,6 +1,7 @@
 package com.tapman104.mpvplayer.player.ui.dialog
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,23 +24,28 @@ fun SubtitleAppearanceDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF2A2A2A),
+        containerColor = Color(0xFF1A1A1A),
+        shape = RoundedCornerShape(20.dp),
+        tonalElevation = 0.dp,
         title = {
             Text(
                 text = "Subtitle Appearance",
                 color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                fontSize = 17.sp,
             )
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                HorizontalDivider(color = Color.White.copy(alpha = 0.15f))
-
-                Text("Size", color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp)
+            Column {
+                Text(
+                    "Size",
+                    color = Color.White.copy(alpha = 0.4f),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Size", color = Color.White, modifier = Modifier.width(72.dp), fontSize = 14.sp)
+                    Text("Size", color = Color.White.copy(alpha = 0.45f), modifier = Modifier.width(52.dp), fontSize = 13.sp)
                     Slider(
                         value = size,
                         onValueChange = { size = it },
@@ -48,12 +54,12 @@ fun SubtitleAppearanceDialog(
                         colors = SliderDefaults.colors(
                             thumbColor = Color.White,
                             activeTrackColor = Color.White,
-                            inactiveTrackColor = Color.White.copy(alpha = 0.3f),
+                            inactiveTrackColor = Color.White.copy(alpha = 0.12f),
                         ),
                     )
                     Text(
                         text = "${"%.1f".format(size)}×",
-                        color = Color.White,
+                        color = Color.White.copy(alpha = 0.6f),
                         modifier = Modifier
                             .width(40.dp)
                             .padding(start = 8.dp),
@@ -61,14 +67,13 @@ fun SubtitleAppearanceDialog(
                     )
                 }
 
-                Text(
-                    "Position  ↑ higher = further from bottom",
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 13.sp,
-                )
+                Column(modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)) {
+                    Text("Position", fontSize = 12.sp, color = Color.White.copy(alpha = 0.4f))
+                    Text("↑ higher = further from bottom", fontSize = 11.sp, color = Color.White.copy(alpha = 0.25f))
+                }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Position", color = Color.White, modifier = Modifier.width(72.dp), fontSize = 14.sp)
+                    Text("Position", color = Color.White.copy(alpha = 0.45f), modifier = Modifier.width(52.dp), fontSize = 13.sp)
                     Slider(
                         value = position,
                         onValueChange = { position = it },
@@ -77,12 +82,12 @@ fun SubtitleAppearanceDialog(
                         colors = SliderDefaults.colors(
                             thumbColor = Color.White,
                             activeTrackColor = Color.White,
-                            inactiveTrackColor = Color.White.copy(alpha = 0.3f),
+                            inactiveTrackColor = Color.White.copy(alpha = 0.12f),
                         ),
                     )
                     Text(
                         text = "${"%.2f".format(position)}",
-                        color = Color.White,
+                        color = Color.White.copy(alpha = 0.6f),
                         modifier = Modifier
                             .width(40.dp)
                             .padding(start = 8.dp),
@@ -100,16 +105,17 @@ fun SubtitleAppearanceDialog(
                     onReset()
                     onDismiss()
                 }) {
-                    Text("Reset", color = Color.White.copy(alpha = 0.7f))
+                    Text("Reset", color = Color.White.copy(alpha = 0.4f), fontSize = 13.sp)
                 }
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel", color = Color.White)
+                    Text("Cancel", color = Color.White.copy(alpha = 0.55f), fontSize = 13.sp)
                 }
                 Button(
                     onClick = { onApply(size, position) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                    shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Apply", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Apply", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 }
             }
         },
