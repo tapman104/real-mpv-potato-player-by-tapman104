@@ -2,6 +2,8 @@ package com.tapman104.mpvplayer.player.ui.overlay
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -38,57 +40,62 @@ fun Modifier.horizontalSeekGesture(
     onSeekTo: (Long) -> Unit,
     onSeekLabel: (current: String, delta: String) -> Unit,
     onSeekLabelClear: () -> Unit,
-    sensitivityPx: Float = 300f,
-): Modifier = this.pointerInput(isEnabled, isVerticalGestureActive, currentPositionMs, durationMs) {
-    if (!isEnabled || isVerticalGestureActive) return@pointerInput
-    awaitEachGesture {
-        val firstDown = awaitFirstDown(requireUnconsumed = false)
-        val downTime = System.currentTimeMillis()
-        val startX = firstDown.position.x
-        val startY = firstDown.position.y
+    sensitivityPx: Float = -1f,
+): Modifier {
+    val currentPositionMsState = rememberUpdatedState(currentPositionMs)
+    val durationMsState = rememberUpdatedState(durationMs)
+    return this.pointerInput(isEnabled, isVerticalGestureActive) {
+        if (!isEnabled || isVerticalGestureActive) return@pointerInput
+        awaitEachGesture {
+            val firstDown = awaitFirstDown(requireUnconsumed = false)
+            val downTime = System.currentTimeMillis()
+            val startX = firstDown.position.x
+            val startY = firstDown.position.y
 
-        var seekActive = false
-        var initialPositionMs = currentPositionMs
+            var seekActive = false
+            var initialPositionMs = currentPositionMsState.value
 
-        while (true) {
-            val event = awaitPointerEvent(PointerEventPass.Main)
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
 
-            // Cancel on multi-touch
-            if (event.changes.count { it.pressed } > 1) break
+                // Cancel on multi-touch
+                if (event.changes.count { it.pressed } > 1) break
 
-            val change = event.changes.firstOrNull { it.id == firstDown.id } ?: break
-            if (!change.pressed) {
+                val change = event.changes.firstOrNull { it.id == firstDown.id } ?: break
+                if (!change.pressed) {
+                    if (seekActive) {
+                        change.consume()
+                        onSeekEnd()
+                        onSeekLabelClear() // timed hide is handled by LaunchedEffect in the composable
+                    }
+                    break
+                }
+
+                val deltaX = change.position.x - startX
+                val deltaY = change.position.y - startY
+                val elapsed = System.currentTimeMillis() - downTime
+
+                if (!seekActive) {
+                    // Activation condition
+                    if (abs(deltaX) > 30f && abs(deltaX) > abs(deltaY) * 2f && elapsed > 100) {
+                        seekActive = true
+                        initialPositionMs = currentPositionMsState.value
+                        onSeekStart()
+                    }
+                }
+
                 if (seekActive) {
                     change.consume()
-                    onSeekEnd()
-                    onSeekLabelClear() // timed hide is handled by LaunchedEffect in the composable
+                    val effectiveSensitivity = if (sensitivityPx > 0f) sensitivityPx else size.width.toFloat()
+                    val dur = durationMsState.value
+                    val factor = if (dur > 0) dur.toFloat() / effectiveSensitivity else 1f
+                    val targetMs = (initialPositionMs + (deltaX * factor).toLong())
+                        .coerceIn(0L, dur)
+                    onSeekTo(targetMs)
+                    val deltaMs = targetMs - initialPositionMs
+                    val sign = if (deltaMs >= 0) "+" else ""
+                    onSeekLabel(formatMs(targetMs), "$sign${formatMs(abs(deltaMs))}")
                 }
-                break
-            }
-
-            val deltaX = change.position.x - startX
-            val deltaY = change.position.y - startY
-            val elapsed = System.currentTimeMillis() - downTime
-
-            if (!seekActive) {
-                // Activation condition
-                if (abs(deltaX) > 30f && abs(deltaX) > abs(deltaY) * 2f && elapsed > 100) {
-                    seekActive = true
-                    initialPositionMs = currentPositionMs
-                    onSeekStart()
-                }
-            }
-
-            if (seekActive) {
-                change.consume()
-                // sensitivityPx px maps to the full duration
-                val factor = if (durationMs > 0) durationMs.toFloat() / sensitivityPx else 1f
-                val targetMs = (initialPositionMs + (deltaX * factor).toLong())
-                    .coerceIn(0L, durationMs)
-                onSeekTo(targetMs)
-                val deltaMs = targetMs - initialPositionMs
-                val sign = if (deltaMs >= 0) "+" else ""
-                onSeekLabel(formatMs(targetMs), "$sign${formatMs(abs(deltaMs))}")
             }
         }
     }
@@ -109,47 +116,50 @@ fun Modifier.pinchToZoomGesture(
     onZoomChange: (Float) -> Unit,
     onZoomLabel: () -> Unit,
     onZoomLabelClear: () -> Unit,
-): Modifier = this.pointerInput(isEnabled, isVerticalGestureActive, currentZoom) {
-    if (!isEnabled || isVerticalGestureActive) return@pointerInput
-    awaitEachGesture {
-        // Wait for first finger
-        awaitFirstDown(requireUnconsumed = false)
+): Modifier {
+    val currentZoomState = rememberUpdatedState(currentZoom)
+    return this.pointerInput(isEnabled, isVerticalGestureActive) {
+        if (!isEnabled || isVerticalGestureActive) return@pointerInput
+        awaitEachGesture {
+            // Wait for first finger
+            awaitFirstDown(requireUnconsumed = false)
 
-        var zoom = currentZoom
-        var prevDist = -1f
-        var zoomActive = false
+            var zoom = currentZoomState.value
+            var prevDist = -1f
+            var zoomActive = false
 
-        while (true) {
-            val event = awaitPointerEvent(PointerEventPass.Main)
-            val pressed = event.changes.filter { it.pressed }
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
+                val pressed = event.changes.filter { it.pressed }
 
-            if (pressed.size < 2) {
-                if (zoomActive) onZoomLabelClear()
-                break
-            }
-
-            val p0 = pressed[0].position
-            val p1 = pressed[1].position
-            val dx = p1.x - p0.x
-            val dy = p1.y - p0.y
-            val dist = sqrt(dx * dx + dy * dy)
-
-            if (prevDist < 0f) {
-                prevDist = dist
-                continue
-            }
-
-            if (abs(dist - prevDist) > 5f) {
-                if (!zoomActive) {
-                    zoomActive = true
-                    onZoomLabel()
+                if (pressed.size < 2) {
+                    if (zoomActive) onZoomLabelClear()
+                    break
                 }
-                val zoomDelta = ln(dist / prevDist) * 1.2f
-                zoom = (zoom + zoomDelta).coerceIn(-1f, 3f)
-                onZoomChange(zoom)
-                pressed.forEach { it.consume() }
+
+                val p0 = pressed[0].position
+                val p1 = pressed[1].position
+                val dx = p1.x - p0.x
+                val dy = p1.y - p0.y
+                val dist = sqrt(dx * dx + dy * dy)
+
+                if (prevDist < 0f) {
+                    prevDist = dist
+                    continue
+                }
+
+                if (abs(dist - prevDist) > 5f) {
+                    if (!zoomActive) {
+                        zoomActive = true
+                        onZoomLabel()
+                    }
+                    val zoomDelta = ln(dist / prevDist) * 1.2f
+                    zoom = (zoom + zoomDelta).coerceIn(-1f, 3f)
+                    onZoomChange(zoom)
+                    pressed.forEach { it.consume() }
+                }
+                prevDist = dist
             }
-            prevDist = dist
         }
     }
 }
@@ -160,8 +170,8 @@ fun Modifier.pinchToZoomGesture(
 
 /**
  * Recognises a single-finger drag as a pan gesture, but only when
- * [currentZoom] > 0 (i.e. the video is zoomed in). Uses EMA smoothing and
- * clamps pan to the visible bounds derived from the current scale.
+ * [currentZoom] > 0 (i.e. the video is zoomed in). Clamps pan to the visible
+ * bounds derived from the current scale.
  */
 fun Modifier.panGesture(
     isEnabled: Boolean,
@@ -172,55 +182,51 @@ fun Modifier.panGesture(
     videoDisplayWidth: Float,
     videoDisplayHeight: Float,
     onPanChange: (Float, Float) -> Unit,
-): Modifier = this.pointerInput(
-    isEnabled, isVerticalGestureActive, currentZoom, currentPanX, currentPanY,
-    videoDisplayWidth, videoDisplayHeight
-) {
-    if (!isEnabled || isVerticalGestureActive || currentZoom <= 0f) return@pointerInput
-    awaitEachGesture {
-        val firstDown = awaitFirstDown(requireUnconsumed = false)
-        val startX = firstDown.position.x
-        val startY = firstDown.position.y
+): Modifier {
+    val currentZoomState = rememberUpdatedState(currentZoom)
+    val currentPanXState = rememberUpdatedState(currentPanX)
+    val currentPanYState = rememberUpdatedState(currentPanY)
+    return this.pointerInput(isEnabled, isVerticalGestureActive) {
+        if (!isEnabled || isVerticalGestureActive || currentZoomState.value <= 0f) return@pointerInput
+        awaitEachGesture {
+            val firstDown = awaitFirstDown(requireUnconsumed = false)
+            val startX = firstDown.position.x
+            val startY = firstDown.position.y
 
-        var panActive = false
-        var smoothX = currentPanX
-        var smoothY = currentPanY
+            val initialPanX = currentPanXState.value
+            val initialPanY = currentPanYState.value
+            val scale = 2f.pow(currentZoomState.value)
+            val maxPan = ((scale - 1f) / (2f * scale)).coerceAtLeast(0f)
+            val safeWidth = if (videoDisplayWidth > 0f) videoDisplayWidth else 1f
+            val safeHeight = if (videoDisplayHeight > 0f) videoDisplayHeight else 1f
 
-        val scale = 2f.pow(currentZoom)
-        val maxPan = ((scale - 1f) / (2f * scale)).coerceAtLeast(0f)
-        val safeWidth = if (videoDisplayWidth > 0f) videoDisplayWidth else 1f
-        val safeHeight = if (videoDisplayHeight > 0f) videoDisplayHeight else 1f
+            var panActive = false
 
-        while (true) {
-            val event = awaitPointerEvent(PointerEventPass.Main)
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
 
-            // Bail if multi-touch (let pinch-to-zoom take over)
-            if (event.changes.count { it.pressed } > 1) break
+                // Bail if multi-touch (let pinch-to-zoom take over)
+                if (event.changes.count { it.pressed } > 1) break
 
-            val change = event.changes.firstOrNull { it.id == firstDown.id } ?: break
-            if (!change.pressed) break
+                val change = event.changes.firstOrNull { it.id == firstDown.id } ?: break
+                if (!change.pressed) break
 
-            val deltaX = change.position.x - startX
-            val deltaY = change.position.y - startY
+                val deltaX = change.position.x - startX
+                val deltaY = change.position.y - startY
 
-            if (!panActive) {
-                if (sqrt(deltaX * deltaX + deltaY * deltaY) > 20f) {
-                    panActive = true
+                if (!panActive) {
+                    if (sqrt(deltaX * deltaX + deltaY * deltaY) > 20f) {
+                        panActive = true
+                    }
                 }
-            }
 
-            if (panActive) {
-                change.consume()
-                val targetX = currentPanX + (deltaX / (safeWidth * scale))
-                val targetY = currentPanY + (deltaY / (safeHeight * scale))
+                if (panActive) {
+                    change.consume()
+                    val targetX = (initialPanX + (deltaX / (safeWidth * scale))).coerceIn(-maxPan, maxPan)
+                    val targetY = (initialPanY + (deltaY / (safeHeight * scale))).coerceIn(-maxPan, maxPan)
 
-                // EMA smoothing (alpha = 0.5)
-                smoothX += (targetX - smoothX) * 0.5f
-                smoothY += (targetY - smoothY) * 0.5f
-
-                val clampedX = smoothX.coerceIn(-maxPan, maxPan)
-                val clampedY = smoothY.coerceIn(-maxPan, maxPan)
-                onPanChange(clampedX, clampedY)
+                    onPanChange(targetX, targetY)
+                }
             }
         }
     }

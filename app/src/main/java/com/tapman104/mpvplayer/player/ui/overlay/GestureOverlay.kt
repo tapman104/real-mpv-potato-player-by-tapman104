@@ -65,6 +65,7 @@ fun GestureOverlay(
 
     // Labels for the new gestures
     var seekScrubLabel by remember { mutableStateOf("") }
+    var seekScrubClearTrigger by remember { mutableIntStateOf(0) }
     var showZoomLabel by remember { mutableStateOf(false) }
     var zoomLabelTrigger by remember { mutableIntStateOf(0) }
 
@@ -95,6 +96,13 @@ fun GestureOverlay(
         }
     }
 
+    LaunchedEffect(seekScrubClearTrigger) {
+        if (seekScrubClearTrigger > 0) {
+            delay(800)
+            seekScrubLabel = ""
+        }
+    }
+
     // Auto-hide zoom label after 1500ms
     LaunchedEffect(zoomLabelTrigger) {
         if (zoomLabelTrigger > 0) {
@@ -121,6 +129,7 @@ fun GestureOverlay(
                         var isDragging = false
                         var isLongPressingLocal = false
                         var isConsumed = false
+                        var horizontalExitDetected = false
                         var firstUp: androidx.compose.ui.input.pointer.PointerInputChange? = null
 
                         try {
@@ -142,6 +151,7 @@ fun GestureOverlay(
                                         isDragging = true
                                         break
                                     } else if (kotlin.math.abs(dx) > 20f) {
+                                        horizontalExitDetected = true
                                         firstUp = change
                                         break
                                     }
@@ -220,14 +230,18 @@ fun GestureOverlay(
                             isLongPressing = false
                             onSpeedRestore()
                         } else {
-                            firstUp?.consume()
+                            if (!horizontalExitDetected) {
+                                firstUp?.consume()
+                            }
 
                             val secondDown = withTimeoutOrNull(300L) {
                                 awaitFirstDown(requireUnconsumed = false)
                             }
 
                             if (secondDown == null) {
-                                onToggleControls()
+                                if (!horizontalExitDetected) {
+                                    onToggleControls()
+                                }
                             } else {
                                 if (secondDown.isConsumed) return@awaitEachGesture
                                 secondDown.consume()
@@ -323,7 +337,7 @@ fun GestureOverlay(
                     onSeekLabel = { current, delta ->
                         seekScrubLabel = "$current  ($delta)"
                     },
-                    onSeekLabelClear = { seekScrubLabel = "" },
+                    onSeekLabelClear = { seekScrubClearTrigger++ },
                 )
                 .pinchToZoomGesture(
                     isEnabled = true,
