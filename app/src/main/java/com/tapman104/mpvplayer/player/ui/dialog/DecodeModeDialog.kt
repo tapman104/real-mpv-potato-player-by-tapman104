@@ -1,18 +1,22 @@
 package com.tapman104.mpvplayer.player.ui.dialog
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.outlined.FlashOn
+import androidx.compose.material.icons.outlined.Memory
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,9 +34,8 @@ fun DecodeModeDialog(
             Text(
                 text = "Decode Mode",
                 color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Medium
             )
         },
         text = {
@@ -43,6 +46,7 @@ fun DecodeModeDialog(
                 DecodeModeOption(
                     title = "Software (SW)",
                     description = "Slowest, most compatible",
+                    icon = Icons.Outlined.Memory,
                     isSelected = currentDecodeMode == DecodeMode.SW,
                     onClick = {
                         onSelectMode(DecodeMode.SW)
@@ -52,6 +56,7 @@ fun DecodeModeDialog(
                 DecodeModeOption(
                     title = "Hardware (HW)",
                     description = "Fast, uses device decoder",
+                    icon = Icons.Outlined.Speed,
                     isSelected = currentDecodeMode == DecodeMode.HW,
                     onClick = {
                         onSelectMode(DecodeMode.HW)
@@ -61,6 +66,7 @@ fun DecodeModeDialog(
                 DecodeModeOption(
                     title = "Hardware+ (HW+)",
                     description = "Hardware + copy-back (Recommended)",
+                    icon = Icons.Outlined.FlashOn,
                     isSelected = currentDecodeMode == DecodeMode.HWPlus,
                     onClick = {
                         onSelectMode(DecodeMode.HWPlus)
@@ -71,12 +77,12 @@ fun DecodeModeDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close", color = Color(0xFFFFB300), fontWeight = FontWeight.SemiBold)
+                Text("Close", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
             }
         },
-        containerColor = Color(0xFF1E1E1E),
+        containerColor = Color(0xFF1A1A1A),
         shape = RoundedCornerShape(20.dp),
-        tonalElevation = 8.dp
+        tonalElevation = 0.dp
     )
 }
 
@@ -84,43 +90,70 @@ fun DecodeModeDialog(
 private fun DecodeModeOption(
     title: String,
     description: String,
+    icon: ImageVector,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFFFFB300).copy(alpha = 0.15f) else Color(0xFF2A2A2A)
+    val backgroundColor = if (isSelected) Color(0xFFFFB300).copy(alpha = 0.10f) else Color(0xFF232323)
+    val borderColor = if (isSelected) Color(0xFFFFB300).copy(alpha = 0.30f) else Color.White.copy(alpha = 0.06f)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(backgroundColor)
+            .border(0.5.dp, borderColor, RoundedCornerShape(14.dp))
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                color = if (isSelected) Color(0xFFFFB300) else Color.White,
-                fontSize = 16.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = description,
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 13.sp,
-                lineHeight = 18.sp
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isSelected) Color(0xFFFFB300).copy(alpha = 0.15f) else Color.White.copy(alpha = 0.05f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (isSelected) Color(0xFFFFB300) else Color.White.copy(alpha = 0.55f),
+                modifier = Modifier.size(18.dp)
             )
         }
         
         Spacer(modifier = Modifier.width(12.dp))
         
-        Icon(
-            imageVector = if (isSelected) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-            contentDescription = null,
-            tint = if (isSelected) Color(0xFFFFB300) else Color.White.copy(alpha = 0.4f),
-            modifier = Modifier.size(24.dp)
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                color = if (isSelected) Color(0xFFFFB300) else Color.White,
+                fontSize = 14.sp,
+                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = description,
+                color = Color.White.copy(alpha = 0.4f),
+                fontSize = 12.sp
+            )
+        }
+        
+        Box(
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .size(18.dp)
+                .border(1.5.dp, Color.White.copy(alpha = 0.25f), CircleShape)
+                .background(if (isSelected) Color(0xFFFFB300) else Color.Transparent, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(Color.White, CircleShape)
+                )
+            }
+        }
     }
 }

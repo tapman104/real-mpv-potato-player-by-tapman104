@@ -1,12 +1,20 @@
 package com.tapman104.mpvplayer.player.ui.dialog
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ResumeDialog(
@@ -17,42 +25,48 @@ fun ResumeDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF1E1E1E),
-        title = {
-            Text(
-                text = "Resume Playback",
-                color = Color.White
-            )
-        },
+        containerColor = Color(0xFF1A1A1A),
+        shape = RoundedCornerShape(20.dp),
+        tonalElevation = 0.dp,
         text = {
-            Text(
-                text = "Resume from ${formatResumeMs(resumePositionMs)}?",
-                color = Color.White.copy(alpha = 0.87f)
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onResume()
-                    onDismiss()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF8B5CF6)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = formatResumeMs(resumePositionMs),
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White,
+                    letterSpacing = (-0.5).sp
                 )
-            ) {
-                Text("Resume", color = Color.White)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = "Continue where you left off?",
+                    fontSize = 13.sp,
+                    color = Color.White.copy(alpha = 0.45f)
+                )
+                Spacer(Modifier.height(20.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedButton(
+                        onClick = { onStartOver(); onDismiss() },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.15f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White.copy(alpha = 0.7f))
+                    ) { Text("Start over", fontSize = 14.sp) }
+                    Button(
+                        onClick = { onResume(); onDismiss() },
+                        modifier = Modifier.weight(1.4f),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6))
+                    ) { Text("Resume", fontSize = 14.sp, fontWeight = FontWeight.Medium) }
+                }
             }
         },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onStartOver()
-                    onDismiss()
-                }
-            ) {
-                Text("Start Over", color = Color.White.copy(alpha = 0.7f))
-            }
-        }
+        confirmButton = {},
+        dismissButton = {}
     )
 }
 
