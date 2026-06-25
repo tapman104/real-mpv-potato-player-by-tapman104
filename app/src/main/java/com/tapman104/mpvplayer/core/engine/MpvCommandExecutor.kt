@@ -70,7 +70,7 @@ class MpvCommandExecutor {
 
     fun seek(seconds: Double) {
         execute {
-            MPVLib.command("seek", seconds.toString(), "absolute")
+            MPVLib.command("seek", seconds.toString(), "absolute", "exact")
         }
     }
 
@@ -131,11 +131,21 @@ class MpvCommandExecutor {
         }
     }
 
+    private var lastZoom = Float.NaN
+
     fun setVideoZoom(zoom: Float) {
+        if (zoom == lastZoom) return
+        lastZoom = zoom
         execute { MPVLib.setPropertyDouble("video-zoom", zoom.toDouble()) }
     }
 
+    private var lastPanX = Float.NaN
+    private var lastPanY = Float.NaN
+
     fun setVideoPan(panX: Float, panY: Float) {
+        if (panX == lastPanX && panY == lastPanY) return
+        lastPanX = panX
+        lastPanY = panY
         execute {
             MPVLib.setPropertyDouble("video-pan-x", panX.toDouble())
             MPVLib.setPropertyDouble("video-pan-y", panY.toDouble())

@@ -57,9 +57,7 @@ fun PlayerScreen(
             // update is called on every recomposition — keeping the SurfaceView
             // reference alive prevents Compose from recycling/destroying the
             // SurfaceHolder that mpv renders into (which causes a black screen).
-            update = { view -> 
-                view.setOnTouchListener { _, _ -> false }
-            },
+            update = { /* intentionally empty — factory already set the touch listener */ },
             modifier = Modifier.fillMaxSize()
         )
 
