@@ -28,60 +28,104 @@ fun MoreOptionsDialog(
     onAspectRatio: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismiss,
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Close", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
-            }
-        },
-        containerColor = Color(0xFF1A1A1A),
-        shape = RoundedCornerShape(20.dp),
-        tonalElevation = 0.dp,
-        title = {
-            Text("More Options", color = Color.White, fontWeight = FontWeight.Medium, fontSize = 17.sp)
-        },
-        text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                MoreOptionsRow(
-                    icon = Icons.Filled.FolderOpen,
-                    label = "Open File",
-                    onClick = {
-                        onOpenFile()
-                        onDismiss()
+        properties = androidx.compose.ui.window.DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null,
+                    onClick = onDismiss
+                ),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(320.dp)
+                    .clickable(
+                        interactionSource = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                        indication = null,
+                        onClick = {}
+                    ),
+                shape = RoundedCornerShape(
+                    topStart = 20.dp,
+                    bottomStart = 20.dp,
+                    topEnd = 0.dp,
+                    bottomEnd = 0.dp
+                ),
+                color = Color(0xFF1A1A1A),
+                tonalElevation = 0.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "More Options",
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 17.sp,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+                    
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        MoreOptionsRow(
+                            icon = Icons.Filled.FolderOpen,
+                            label = "Open File",
+                            onClick = {
+                                onOpenFile()
+                                onDismiss()
+                            }
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        MoreOptionsRow(
+                            icon = Icons.Filled.Speed,
+                            label = "Playback Speed",
+                            onClick = {
+                                onPlaybackSpeed()
+                                onDismiss()
+                            }
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        MoreOptionsRow(
+                            icon = Icons.Filled.Loop,
+                            label = "Loop / Repeat",
+                            onClick = {
+                                onLoopRepeat()
+                                onDismiss()
+                            }
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        MoreOptionsRow(
+                            icon = Icons.Filled.AspectRatio,
+                            label = "Aspect Ratio",
+                            onClick = {
+                                onAspectRatio()
+                                onDismiss()
+                            }
+                        )
                     }
-                )
-                HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
-                MoreOptionsRow(
-                    icon = Icons.Filled.Speed,
-                    label = "Playback Speed",
-                    onClick = {
-                        onPlaybackSpeed()
-                        onDismiss()
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    TextButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("Close", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
                     }
-                )
-                HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
-                MoreOptionsRow(
-                    icon = Icons.Filled.Loop,
-                    label = "Loop / Repeat",
-                    onClick = {
-                        onLoopRepeat()
-                        onDismiss()
-                    }
-                )
-                HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
-                MoreOptionsRow(
-                    icon = Icons.Filled.AspectRatio,
-                    label = "Aspect Ratio",
-                    onClick = {
-                        onAspectRatio()
-                        onDismiss()
-                    }
-                )
+                }
             }
         }
-    )
+    }
 }
 
 @Composable

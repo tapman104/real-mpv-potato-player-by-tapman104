@@ -94,8 +94,8 @@ private fun DecodeModeOption(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFFFFB300).copy(alpha = 0.10f) else Color(0xFF232323)
-    val borderColor = if (isSelected) Color(0xFFFFB300).copy(alpha = 0.30f) else Color.White.copy(alpha = 0.06f)
+    val backgroundColor = if (isSelected) Color(0xFF8B5CF6).copy(alpha = 0.10f) else Color(0xFF232323)
+    val borderColor = if (isSelected) Color(0xFF8B5CF6).copy(alpha = 0.30f) else Color.White.copy(alpha = 0.06f)
 
     Row(
         modifier = Modifier
@@ -111,13 +111,13 @@ private fun DecodeModeOption(
             modifier = Modifier
                 .size(36.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(if (isSelected) Color(0xFFFFB300).copy(alpha = 0.15f) else Color.White.copy(alpha = 0.05f)),
+                .background(if (isSelected) Color(0xFF8B5CF6).copy(alpha = 0.15f) else Color.White.copy(alpha = 0.05f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isSelected) Color(0xFFFFB300) else Color.White.copy(alpha = 0.55f),
+                tint = if (isSelected) Color(0xFF8B5CF6) else Color.White.copy(alpha = 0.55f),
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -127,7 +127,7 @@ private fun DecodeModeOption(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                color = if (isSelected) Color(0xFFFFB300) else Color.White,
+                color = if (isSelected) Color(0xFF8B5CF6) else Color.White,
                 fontSize = 14.sp,
                 fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
             )
@@ -144,7 +144,7 @@ private fun DecodeModeOption(
                 .padding(start = 8.dp)
                 .size(18.dp)
                 .border(1.5.dp, Color.White.copy(alpha = 0.25f), CircleShape)
-                .background(if (isSelected) Color(0xFFFFB300) else Color.Transparent, CircleShape),
+                .background(if (isSelected) Color(0xFF8B5CF6) else Color.Transparent, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             if (isSelected) {
