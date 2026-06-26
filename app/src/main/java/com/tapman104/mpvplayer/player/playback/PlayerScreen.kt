@@ -41,6 +41,7 @@ fun PlayerScreen(
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
+    val toggleControls = { controlsVisible = !controlsVisible }
 
     Box(
         modifier = Modifier
@@ -66,7 +67,7 @@ fun PlayerScreen(
             onSeekBackward = { onSeekRelative(-10_000L) },
             onSpeedOverride = onSpeedOverride,
             onSpeedRestore = onSpeedRestore,
-            onToggleControls = { controlsVisible = !controlsVisible },
+            onToggleControls = toggleControls,
             // Seek scrub
             currentPositionMs = playerState.currentPositionMs,
             durationMs = playerState.durationMs,
