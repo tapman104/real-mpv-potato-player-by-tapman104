@@ -22,7 +22,8 @@ fun Modifier.verticalSwipeGesture(
     onVolumeChange: (percent: Int) -> Unit,
     onBrightnessChange: (percent: Int) -> Unit,
     onSwipeStart: () -> Unit,
-    onSwipeEnd: () -> Unit,
+    onVolumeSwipeEnd: () -> Unit,
+    onBrightnessSwipeEnd: () -> Unit,
 ): Modifier = composed {
     val context = LocalContext.current
     val currentActivity by rememberUpdatedState(activity)
@@ -30,7 +31,8 @@ fun Modifier.verticalSwipeGesture(
     val currentOnVolumeChange by rememberUpdatedState(onVolumeChange)
     val currentOnBrightnessChange by rememberUpdatedState(onBrightnessChange)
     val currentOnSwipeStart by rememberUpdatedState(onSwipeStart)
-    val currentOnSwipeEnd by rememberUpdatedState(onSwipeEnd)
+    val currentOnVolumeSwipeEnd by rememberUpdatedState(onVolumeSwipeEnd)
+    val currentOnBrightnessSwipeEnd by rememberUpdatedState(onBrightnessSwipeEnd)
 
     pointerInput(Unit) {
         var lastKnownBrightness = -1f
@@ -123,7 +125,11 @@ fun Modifier.verticalSwipeGesture(
                     }
                     change.consume()
                 }
-                currentOnSwipeEnd()
+                if (isRightSide) {
+                    currentOnVolumeSwipeEnd()
+                } else {
+                    currentOnBrightnessSwipeEnd()
+                }
                 lastKnownBrightness = currentBrightness
             }
         }

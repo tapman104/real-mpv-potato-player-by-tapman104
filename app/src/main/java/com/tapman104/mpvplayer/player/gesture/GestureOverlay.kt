@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Brightness6
+import androidx.compose.material.icons.rounded.VolumeDown
+import androidx.compose.material.icons.rounded.VolumeOff
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -96,9 +98,11 @@ fun GestureOverlay(
 
     var showBrightness by remember { mutableStateOf(false) }
     var brightnessPercent by remember { mutableIntStateOf(0) }
+    var brightnessHideTrigger by remember { mutableIntStateOf(0) }
 
     var showVolume by remember { mutableStateOf(false) }
     var volumePercent by remember { mutableIntStateOf(0) }
+    var volumeHideTrigger by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(labelTrigger) {
         if (labelTrigger > 0) {
@@ -119,6 +123,20 @@ fun GestureOverlay(
         if (zoomLabelTrigger > 0) {
             delay(1500)
             showZoomLabel = false
+        }
+    }
+
+    LaunchedEffect(volumeHideTrigger) {
+        if (volumeHideTrigger > 0) {
+            delay(800)
+            showVolume = false
+        }
+    }
+
+    LaunchedEffect(brightnessHideTrigger) {
+        if (brightnessHideTrigger > 0) {
+            delay(800)
+            showBrightness = false
         }
     }
 
@@ -143,9 +161,12 @@ fun GestureOverlay(
                         brightnessPercent = it
                     },
                     onSwipeStart = { isVerticalGestureActiveLocal = true },
-                    onSwipeEnd = {
-                        showVolume = false
-                        showBrightness = false
+                    onVolumeSwipeEnd = {
+                        volumeHideTrigger++
+                        isVerticalGestureActiveLocal = false
+                    },
+                    onBrightnessSwipeEnd = {
+                        brightnessHideTrigger++
                         isVerticalGestureActiveLocal = false
                     }
                 )
@@ -215,8 +236,8 @@ fun GestureOverlay(
 
             AnimatedVisibility(
                 visible = showVolume,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically(),
+                enter = fadeIn(tween(200)) + slideInVertically(tween(200)) { it / 2 },
+                exit = fadeOut(tween(300)) + slideOutVertically(tween(300)) { it / 2 },
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .padding(horizontal = 48.dp)
@@ -226,8 +247,8 @@ fun GestureOverlay(
 
             AnimatedVisibility(
                 visible = showBrightness,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically(),
+                enter = fadeIn(tween(200)) + slideInVertically(tween(200)) { it / 2 },
+                exit = fadeOut(tween(300)) + slideOutVertically(tween(300)) { it / 2 },
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(horizontal = 48.dp)
@@ -306,8 +327,17 @@ private fun IndicatorCard(isVolume: Boolean, percent: Int) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val icon = if (isVolume) {
+                        when {
+                            percent == 0 -> Icons.Rounded.VolumeOff
+                            percent < 50 -> Icons.Rounded.VolumeDown
+                            else -> Icons.Rounded.VolumeUp
+                        }
+                    } else {
+                        Icons.Rounded.Brightness6
+                    }
                     Icon(
-                        imageVector = if (isVolume) Icons.Rounded.VolumeUp else Icons.Rounded.Brightness6,
+                        imageVector = icon,
                         contentDescription = null,
                         tint = Color.White
                     )
