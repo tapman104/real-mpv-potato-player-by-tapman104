@@ -34,6 +34,8 @@ class PlayerViewModel(
 
     private var pendingFileUri: Uri? = null
 
+    private var lastTimePosUpdate = 0L
+    private var lastSeekTime = 0L
 
     val controller = MpvController(context)
 
@@ -87,8 +89,17 @@ class PlayerViewModel(
     fun play() = controller.executor.play()
     fun pause() = controller.executor.pause()
     fun togglePlay() = controller.executor.togglePlay()
-    fun seekTo(positionMs: Long) = controller.executor.seek(positionMs / 1000.0)
-    fun seekRelative(offsetMs: Long) = controller.executor.seekRelative(offsetMs / 1000.0)
+    
+    fun seekTo(positionMs: Long) {
+        lastSeekTime = System.currentTimeMillis()
+        controller.executor.seek(positionMs / 1000.0)
+    }
+    
+    fun seekRelative(offsetMs: Long) {
+        lastSeekTime = System.currentTimeMillis()
+        controller.executor.seekRelative(offsetMs / 1000.0)
+    }
+    
     fun setSpeed(speed: Float) = controller.executor.setSpeed(speed.toDouble())
     fun setVolume(volume: Int) = controller.executor.setVolume(volume)
     fun setAudioTrack(id: Int) {
@@ -413,7 +424,15 @@ class PlayerViewModel(
             }
             MpvConstants.PROP_TIME_POS -> {
                 val seconds = value as? Double ?: return
-                _playerState.update { it.copy(currentPositionMs = (seconds * 1000).toLong()) }
+                val newPosMs = (seconds * 1000).toLong()
+                val now = System.currentTimeMillis()
+                
+                // Throttle updates to 250ms during normal playback to save battery.
+                // Allow fast updates during seeking/scrubbing (if a seek occurred in the last 500ms).
+                if (now - lastSeekTime < 500 || now - lastTimePosUpdate >= 250) {
+                    _playerState.update { it.copy(currentPositionMs = newPosMs) }
+                    lastTimePosUpdate = now
+                }
             }
             MpvConstants.PROP_DURATION -> {
                 val seconds = value as? Double ?: return
