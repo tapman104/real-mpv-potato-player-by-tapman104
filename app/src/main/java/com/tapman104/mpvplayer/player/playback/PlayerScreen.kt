@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.screen
+package com.tapman104.mpvplayer.player.playback
 
 import android.view.SurfaceView
 import androidx.compose.foundation.background
@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import com.tapman104.mpvplayer.player.state.PlayerState
 import com.tapman104.mpvplayer.player.state.PlaylistState
-import com.tapman104.mpvplayer.player.ui.overlay.GestureOverlay
-import com.tapman104.mpvplayer.player.ui.overlay.PlayerOverlay
+import com.tapman104.mpvplayer.player.gesture.GestureOverlay
+import com.tapman104.mpvplayer.player.playback.PlayerOverlay
 
 @Composable
 fun PlayerScreen(

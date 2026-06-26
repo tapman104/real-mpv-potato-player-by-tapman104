@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.overlay
+package com.tapman104.mpvplayer.player.gesture
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown

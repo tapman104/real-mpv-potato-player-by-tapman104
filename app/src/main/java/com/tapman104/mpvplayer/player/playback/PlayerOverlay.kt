@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.overlay
+package com.tapman104.mpvplayer.player.playback
 
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tapman104.mpvplayer.player.state.PlayerState
 import com.tapman104.mpvplayer.player.state.PlaylistState
-import com.tapman104.mpvplayer.player.ui.controls.PlayerTopBar
-import com.tapman104.mpvplayer.player.ui.controls.PlayerBottomBar
-import com.tapman104.mpvplayer.player.ui.dialog.SubtitleAppearanceDialog
+import com.tapman104.mpvplayer.player.controls.PlayerTopBar
+import com.tapman104.mpvplayer.player.controls.PlayerBottomBar
+import com.tapman104.mpvplayer.player.dialog.SubtitleAppearanceDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.video
+package com.tapman104.mpvplayer.player.playback
 
 import android.view.SurfaceView
 import androidx.compose.foundation.layout.fillMaxSize

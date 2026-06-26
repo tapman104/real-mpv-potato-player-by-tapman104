@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.controls
+package com.tapman104.mpvplayer.player.controls
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Slider

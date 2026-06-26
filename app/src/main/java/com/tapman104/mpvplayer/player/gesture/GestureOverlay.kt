@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.overlay
+package com.tapman104.mpvplayer.player.gesture
 
 import android.app.Activity
 import android.content.Context

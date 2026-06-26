@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.controls
+package com.tapman104.mpvplayer.player.controls
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,11 +30,11 @@ import androidx.compose.ui.unit.sp
 import com.tapman104.mpvplayer.player.model.AudioTrack
 import com.tapman104.mpvplayer.player.model.DecodeMode
 import com.tapman104.mpvplayer.player.model.SubtitleTrack
-import com.tapman104.mpvplayer.player.ui.dialog.AudioTrackDialog
-import com.tapman104.mpvplayer.player.ui.dialog.DecodeModeDialog
-import com.tapman104.mpvplayer.player.ui.dialog.MoreOptionsDialog
-import com.tapman104.mpvplayer.player.ui.dialog.PlaybackSpeedDialog
-import com.tapman104.mpvplayer.player.ui.dialog.SubtitleTrackDialog
+import com.tapman104.mpvplayer.player.dialog.AudioTrackDialog
+import com.tapman104.mpvplayer.player.dialog.DecodeModeDialog
+import com.tapman104.mpvplayer.player.dialog.MoreOptionsDialog
+import com.tapman104.mpvplayer.player.dialog.PlaybackSpeedDialog
+import com.tapman104.mpvplayer.player.dialog.SubtitleTrackDialog
 
 
 @Composable

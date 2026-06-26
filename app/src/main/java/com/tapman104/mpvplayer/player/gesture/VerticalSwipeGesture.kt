@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.overlay
+package com.tapman104.mpvplayer.player.gesture
 
 import android.app.Activity
 import android.media.AudioManager
@@ -36,7 +36,6 @@ fun Modifier.verticalSwipeGesture(
         awaitEachGesture {
             val firstDown = awaitFirstDown(requireUnconsumed = false)
             if (firstDown.isConsumed) return@awaitEachGesture
-            firstDown.consume()
 
             var isDragging = false
             var isConsumed = false
@@ -73,6 +72,7 @@ fun Modifier.verticalSwipeGesture(
             if (isConsumed) return@awaitEachGesture
 
             if (isDragging) {
+                firstDown.consume()
                 val isRightSide = firstDown.position.x > size.width / 2
                 var currentVolume = currentAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
                 val maxVol = currentAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()

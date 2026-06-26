@@ -1,4 +1,4 @@
-package com.tapman104.mpvplayer.player.ui.dialog
+package com.tapman104.mpvplayer.player.dialog
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
