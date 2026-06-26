@@ -10,6 +10,26 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Brightness6
+import androidx.compose.material.icons.rounded.VolumeUp
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -193,27 +213,26 @@ fun GestureOverlay(
                 )
             }
 
-            if (showVolume || showBrightness) {
-                val align = if (showVolume) Alignment.CenterStart else Alignment.CenterEnd
-                val text = if (showVolume) "🔊 $volumePercent%" else "☀️ $brightnessPercent%"
+            AnimatedVisibility(
+                visible = showVolume,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically(),
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(horizontal = 48.dp)
+            ) {
+                IndicatorCard(isVolume = true, percent = volumePercent)
+            }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 48.dp),
-                    contentAlignment = align
-                ) {
-                    Text(
-                        text = text,
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.Black.copy(alpha = 0.45f))
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                }
+            AnimatedVisibility(
+                visible = showBrightness,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically(),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(horizontal = 48.dp)
+            ) {
+                IndicatorCard(isVolume = false, percent = brightnessPercent)
             }
 
             // Seek scrub label
@@ -246,6 +265,59 @@ fun GestureOverlay(
                         .background(Color.Black.copy(alpha = 0.55f))
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun IndicatorCard(isVolume: Boolean, percent: Int) {
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                val animatedFraction by animateFloatAsState(
+                    targetValue = percent / 100f,
+                    animationSpec = tween(150),
+                    label = "fraction"
+                )
+                Box(
+                    modifier = Modifier
+                        .width(4.dp)
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(Color.DarkGray.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(fraction = animatedFraction)
+                            .background(Color.White)
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isVolume) Icons.Rounded.VolumeUp else Icons.Rounded.Brightness6,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                    Text(
+                        text = "$percent%",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

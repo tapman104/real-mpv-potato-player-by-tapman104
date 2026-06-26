@@ -33,6 +33,8 @@ fun Modifier.verticalSwipeGesture(
     val currentOnSwipeEnd by rememberUpdatedState(onSwipeEnd)
 
     pointerInput(Unit) {
+        var lastKnownBrightness = -1f
+        
         awaitEachGesture {
             val firstDown = awaitFirstDown(requireUnconsumed = false)
             if (firstDown.isConsumed) return@awaitEachGesture
@@ -79,10 +81,14 @@ fun Modifier.verticalSwipeGesture(
 
                 var currentBrightness = currentActivity?.window?.attributes?.screenBrightness ?: -1f
                 if (currentBrightness < 0f) {
-                    currentBrightness = try {
-                        Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS) / 255f
-                    } catch (e: Exception) {
-                        0.5f
+                    currentBrightness = if (lastKnownBrightness >= 0f) {
+                        lastKnownBrightness
+                    } else {
+                        try {
+                            Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS) / 255f
+                        } catch (e: Exception) {
+                            0.5f
+                        }
                     }
                 }
 
@@ -118,6 +124,7 @@ fun Modifier.verticalSwipeGesture(
                     change.consume()
                 }
                 currentOnSwipeEnd()
+                lastKnownBrightness = currentBrightness
             }
         }
     }
