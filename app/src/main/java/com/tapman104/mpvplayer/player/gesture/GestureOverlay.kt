@@ -107,7 +107,7 @@ fun GestureOverlay(
         val displayWidthPx = with(density) { maxWidth.toPx() }
         val displayHeightPx = with(density) { maxHeight.toPx() }
 
-        // ── Layer 1: existing tap / double-tap / long-press / volume / brightness ──
+        // ── All gestures stacked in a single Box ──
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -141,6 +141,40 @@ fun GestureOverlay(
                     },
                     onLongPressStart = { isLongPressing = true },
                     onLongPressEnd = { isLongPressing = false }
+                )
+                .horizontalSeekGesture(
+                    isEnabled = true,
+                    isVerticalGestureActive = isVerticalGestureActiveLocal,
+                    currentPositionMs = currentPositionMs,
+                    durationMs = durationMs,
+                    onSeekStart = onPauseForSeek,
+                    onSeekEnd = onResumeAfterSeek,
+                    onSeekTo = onSeekTo,
+                    onSeekLabel = { current, delta ->
+                        seekScrubLabel = "$current  ($delta)"
+                    },
+                    onSeekLabelClear = { seekScrubClearTrigger++ },
+                )
+                .pinchToZoomGesture(
+                    isEnabled = true,
+                    isVerticalGestureActive = isVerticalGestureActiveLocal,
+                    currentZoom = currentZoom,
+                    onZoomChange = onZoomChange,
+                    onZoomLabel = {
+                        showZoomLabel = true
+                        zoomLabelTrigger++
+                    },
+                    onZoomLabelClear = { showZoomLabel = false },
+                )
+                .panGesture(
+                    isEnabled = true,
+                    isVerticalGestureActive = isVerticalGestureActiveLocal,
+                    currentZoom = currentZoom,
+                    currentPanX = currentPanX,
+                    currentPanY = currentPanY,
+                    videoDisplayWidth = displayWidthPx,
+                    videoDisplayHeight = displayHeightPx,
+                    onPanChange = onPanChange,
                 )
         ) {
             val displayLabel = if (isLongPressing) "2×" else seekLabel
@@ -181,47 +215,7 @@ fun GestureOverlay(
                     )
                 }
             }
-        }
 
-        // ── Layer 2: horizontal seek + pinch zoom + pan ──
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .horizontalSeekGesture(
-                    isEnabled = true,
-                    isVerticalGestureActive = isVerticalGestureActiveLocal,
-                    currentPositionMs = currentPositionMs,
-                    durationMs = durationMs,
-                    onSeekStart = onPauseForSeek,
-                    onSeekEnd = onResumeAfterSeek,
-                    onSeekTo = onSeekTo,
-                    onSeekLabel = { current, delta ->
-                        seekScrubLabel = "$current  ($delta)"
-                    },
-                    onSeekLabelClear = { seekScrubClearTrigger++ },
-                )
-                .pinchToZoomGesture(
-                    isEnabled = true,
-                    isVerticalGestureActive = isVerticalGestureActiveLocal,
-                    currentZoom = currentZoom,
-                    onZoomChange = onZoomChange,
-                    onZoomLabel = {
-                        showZoomLabel = true
-                        zoomLabelTrigger++
-                    },
-                    onZoomLabelClear = { showZoomLabel = false },
-                )
-                .panGesture(
-                    isEnabled = true,
-                    isVerticalGestureActive = isVerticalGestureActiveLocal,
-                    currentZoom = currentZoom,
-                    currentPanX = currentPanX,
-                    currentPanY = currentPanY,
-                    videoDisplayWidth = displayWidthPx,
-                    videoDisplayHeight = displayHeightPx,
-                    onPanChange = onPanChange,
-                )
-        ) {
             // Seek scrub label
             if (seekScrubLabel.isNotEmpty()) {
                 Text(
