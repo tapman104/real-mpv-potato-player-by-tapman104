@@ -91,8 +91,32 @@ class PlayerViewModel(
     fun seekRelative(offsetMs: Long) = controller.executor.seekRelative(offsetMs / 1000.0)
     fun setSpeed(speed: Float) = controller.executor.setSpeed(speed.toDouble())
     fun setVolume(volume: Int) = controller.executor.setVolume(volume)
-    fun setAudioTrack(id: Int) = controller.executor.setAudioTrack(id)
-    fun setSubtitleTrack(id: Int) = controller.executor.setSubtitleTrack(id)
+    fun setAudioTrack(id: Int) {
+        controller.executor.setAudioTrack(id)
+        _playerState.update { it.copy(selectedAudioTrackId = id) }
+    }
+    fun setSubtitleTrack(id: Int) {
+        controller.executor.setSubtitleTrack(id)
+        _playerState.update { it.copy(selectedSubtitleTrackId = id) }
+    }
+
+    fun setAspectRatio(mode: AspectRatioMode) {
+        _playerState.update { it.copy(aspectRatio = mode) }
+        when (mode) {
+            AspectRatioMode.DEFAULT, AspectRatioMode.FIT -> controller.executor.execute {
+                MPVLib.setPropertyString("video-aspect-override", "-1")
+                MPVLib.setPropertyDouble("panscan", 0.0)
+            }
+            AspectRatioMode.CROP -> controller.executor.execute {
+                MPVLib.setPropertyString("video-aspect-override", "-1")
+                MPVLib.setPropertyDouble("panscan", 1.0)
+            }
+            AspectRatioMode.STRETCH -> controller.executor.execute {
+                // Approximate stretch or reset pan
+                MPVLib.setPropertyDouble("panscan", 0.0)
+            }
+        }
+    }
 
     // ---------------------------------------------------------------------------
     // Load / URI

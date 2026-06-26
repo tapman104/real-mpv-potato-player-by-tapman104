@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun MoreOptionsDialog(
+    currentDecodeMode: com.tapman104.mpvplayer.player.model.DecodeMode,
+    onDecodeModeChange: (com.tapman104.mpvplayer.player.model.DecodeMode) -> Unit,
+    currentAspectRatio: com.tapman104.mpvplayer.player.model.AspectRatioMode,
     onOpenFile: () -> Unit,
     onPlaybackSpeed: () -> Unit,
     onLoopRepeat: () -> Unit,
@@ -106,10 +109,27 @@ fun MoreOptionsDialog(
                         HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
                         MoreOptionsRow(
                             icon = Icons.Filled.AspectRatio,
-                            label = "Aspect Ratio",
+                            label = "Aspect Ratio: ${currentAspectRatio.displayName}",
                             onClick = {
                                 onAspectRatio()
                                 onDismiss()
+                            }
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        MoreOptionsRow(
+                            icon = Icons.Filled.Speed, // Using Speed icon as a fallback, ideally a Memory icon
+                            label = "Decoder: ${when(currentDecodeMode) {
+                                com.tapman104.mpvplayer.player.model.DecodeMode.HW -> "HW"
+                                com.tapman104.mpvplayer.player.model.DecodeMode.HWPlus -> "HW+"
+                                com.tapman104.mpvplayer.player.model.DecodeMode.SW -> "SW"
+                            }}",
+                            onClick = {
+                                val nextMode = when (currentDecodeMode) {
+                                    com.tapman104.mpvplayer.player.model.DecodeMode.HW -> com.tapman104.mpvplayer.player.model.DecodeMode.HWPlus
+                                    com.tapman104.mpvplayer.player.model.DecodeMode.HWPlus -> com.tapman104.mpvplayer.player.model.DecodeMode.SW
+                                    com.tapman104.mpvplayer.player.model.DecodeMode.SW -> com.tapman104.mpvplayer.player.model.DecodeMode.HW
+                                }
+                                onDecodeModeChange(nextMode)
                             }
                         )
                     }

@@ -134,7 +134,9 @@ class PlayerActivity : ComponentActivity() {
                     },
                     // Zoom / pan
                     onZoomChange = { viewModel.setVideoZoom(it) },
-                    onPanChange = { x, y -> viewModel.setVideoPan(x, y) }
+                    onPanChange = { x, y -> viewModel.setVideoPan(x, y) },
+                    onDecodeModeChange = { viewModel.setDecodeMode(it) },
+                    onAspectRatioChange = { viewModel.setAspectRatio(it) }
                 )
             }
         }

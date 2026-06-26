@@ -38,6 +38,8 @@ fun PlayerScreen(
     // Zoom / pan
     onZoomChange: (Float) -> Unit = {},
     onPanChange: (Float, Float) -> Unit = { _, _ -> },
+    onDecodeModeChange: (com.tapman104.mpvplayer.player.model.DecodeMode) -> Unit = {},
+    onAspectRatioChange: (com.tapman104.mpvplayer.player.model.AspectRatioMode) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
@@ -96,9 +98,10 @@ fun PlayerScreen(
             onSelectSubtitleTrack = onSelectSubtitleTrack,
             onSubtitleAppearance = onSubtitleAppearance,
             onSubtitleReset = onSubtitleReset,
+            onDecodeModeChange = onDecodeModeChange,
+            onAspectRatioChange = onAspectRatioChange,
             onAutoSelectSubtitle = onAutoSelectSubtitle,
             modifier = Modifier.fillMaxSize()
         )
     }
 }
-

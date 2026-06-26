@@ -31,7 +31,6 @@ import com.tapman104.mpvplayer.player.model.AudioTrack
 import com.tapman104.mpvplayer.player.model.DecodeMode
 import com.tapman104.mpvplayer.player.model.SubtitleTrack
 import com.tapman104.mpvplayer.player.dialog.AudioTrackDialog
-import com.tapman104.mpvplayer.player.dialog.DecodeModeDialog
 import com.tapman104.mpvplayer.player.dialog.MoreOptionsDialog
 import com.tapman104.mpvplayer.player.dialog.PlaybackSpeedDialog
 import com.tapman104.mpvplayer.player.dialog.SubtitleTrackDialog
@@ -52,6 +51,8 @@ fun PlayerTopBar(
     onSubtitleAppearanceClick: () -> Unit = {},
     currentDecodeMode: DecodeMode = DecodeMode.HWPlus,
     onDecodeModeChange: (DecodeMode) -> Unit = {},
+    currentAspectRatio: com.tapman104.mpvplayer.player.model.AspectRatioMode,
+    onAspectRatioClick: () -> Unit = {},
     onDialogOpenChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -59,9 +60,8 @@ fun PlayerTopBar(
     var showSubtitleDialog by remember { mutableStateOf(false) }
     var showMoreOptionsDialog by remember { mutableStateOf(false) }
     var showSpeedDialog by remember { mutableStateOf(false) }
-    var showDecodeModeDialog by remember { mutableStateOf(false) }
 
-    val isAnyDialogOpen = showAudioDialog || showSubtitleDialog || showMoreOptionsDialog || showSpeedDialog || showDecodeModeDialog
+    val isAnyDialogOpen = showAudioDialog || showSubtitleDialog || showMoreOptionsDialog || showSpeedDialog
 
     LaunchedEffect(isAnyDialogOpen) {
         onDialogOpenChange(isAnyDialogOpen)
@@ -92,10 +92,13 @@ fun PlayerTopBar(
 
     if (showMoreOptionsDialog) {
         MoreOptionsDialog(
+            currentDecodeMode = currentDecodeMode,
+            onDecodeModeChange = onDecodeModeChange,
+            currentAspectRatio = currentAspectRatio,
             onOpenFile = { onOpenFile(); showMoreOptionsDialog = false },
             onPlaybackSpeed = { showMoreOptionsDialog = false; showSpeedDialog = true },
             onLoopRepeat = { showMoreOptionsDialog = false },
-            onAspectRatio = { showMoreOptionsDialog = false },
+            onAspectRatio = { showMoreOptionsDialog = false; onAspectRatioClick() },
             onDismiss = { showMoreOptionsDialog = false }
         )
     }
@@ -108,13 +111,7 @@ fun PlayerTopBar(
         )
     }
 
-    if (showDecodeModeDialog) {
-        DecodeModeDialog(
-            currentDecodeMode = currentDecodeMode,
-            onSelectMode = onDecodeModeChange,
-            onDismiss = { showDecodeModeDialog = false }
-        )
-    }
+    // DecodeModeDialog removed
 
     Row(
         modifier = modifier
@@ -180,38 +177,7 @@ fun PlayerTopBar(
                 )
             }
 
-            // Decode mode button
-            val decodeModeLabel = when (currentDecodeMode) {
-                DecodeMode.SW     -> "SW"
-                DecodeMode.HW     -> "HW"
-                DecodeMode.HWPlus -> "HW+"
-                else              -> "HW+"
-            }
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clickable { showDecodeModeDialog = true }
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .border(
-                            width = 1.5.dp,
-                            color = Color.White.copy(alpha = 0.85f),
-                            shape = RoundedCornerShape(6.dp)
-                        )
-                        .padding(horizontal = 6.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = decodeModeLabel,
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
+            // Decode mode button removed
             IconButton(
                 onClick = { showMoreOptionsDialog = true },
                 modifier = Modifier.size(48.dp)

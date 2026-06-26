@@ -40,15 +40,18 @@ fun PlayerOverlay(
     onSelectSubtitleTrack: (Int) -> Unit,
     onSubtitleAppearance: (size: Float, position: Float) -> Unit,
     onSubtitleReset: () -> Unit,
+    onDecodeModeChange: (com.tapman104.mpvplayer.player.model.DecodeMode) -> Unit,
+    onAspectRatioChange: (com.tapman104.mpvplayer.player.model.AspectRatioMode) -> Unit,
     // Auto-subtitle
     onAutoSelectSubtitle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showSubtitleAppearance by remember { mutableStateOf(false) }
+    var showAspectRatioDialog by remember { mutableStateOf(false) }
     var isDraggingSeekbar by remember { mutableStateOf(false) }
     var isTopBarDialogOpen by remember { mutableStateOf(false) }
 
-    val isAnyDialogOpen = isTopBarDialogOpen || showSubtitleAppearance
+    val isAnyDialogOpen = isTopBarDialogOpen || showSubtitleAppearance || showAspectRatioDialog
 
     LaunchedEffect(controlsVisible, isDraggingSeekbar, isAnyDialogOpen) {
         if (controlsVisible && !isDraggingSeekbar && !isAnyDialogOpen) {
@@ -114,6 +117,10 @@ fun PlayerOverlay(
                 onSelectAudioTrack = onSelectAudioTrack,
                 onSelectSubtitleTrack = onSelectSubtitleTrack,
                 onSubtitleAppearanceClick = { showSubtitleAppearance = true },
+                currentDecodeMode = playerState.decodeMode,
+                onDecodeModeChange = onDecodeModeChange,
+                currentAspectRatio = playerState.aspectRatio,
+                onAspectRatioClick = { showAspectRatioDialog = true },
                 onDialogOpenChange = { isTopBarDialogOpen = it }
             )
         }
@@ -166,6 +173,17 @@ fun PlayerOverlay(
                     showSubtitleAppearance = false
                 },
                 onDismiss = { showSubtitleAppearance = false },
+            )
+        }
+
+        if (showAspectRatioDialog) {
+            com.tapman104.mpvplayer.player.dialog.AspectRatioDialog(
+                currentMode = playerState.aspectRatio,
+                onSelectMode = { 
+                    onAspectRatioChange(it)
+                    showAspectRatioDialog = false 
+                },
+                onDismiss = { showAspectRatioDialog = false }
             )
         }
 

@@ -23,4 +23,5 @@ data class PlayerState(
     val videoZoom: Float = 0f,      // MPV video-zoom range: -1f to 3f
     val videoPanX: Float = 0f,      // MPV video-pan-x
     val videoPanY: Float = 0f,      // MPV video-pan-y
+    val aspectRatio: com.tapman104.mpvplayer.player.model.AspectRatioMode = com.tapman104.mpvplayer.player.model.AspectRatioMode.DEFAULT,
 )
