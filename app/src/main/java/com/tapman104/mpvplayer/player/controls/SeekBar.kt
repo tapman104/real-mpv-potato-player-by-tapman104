@@ -34,8 +34,8 @@ fun PlayerSeekBar(
     ) {
         Text(
             text = formatMs(displayPositionMs),
-            color = Color.White,
-            fontSize = 13.sp,
+            color = Color.White.copy(alpha = 0.75f),
+            fontSize = 12.sp,
             modifier = Modifier.widthIn(min = 48.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Start
         )
@@ -54,16 +54,16 @@ fun PlayerSeekBar(
             },
             colors = SliderDefaults.colors(
                 thumbColor = Color.White,
-                activeTrackColor = Color.White,
-                inactiveTrackColor = Color.White.copy(alpha = 0.3f)
+                activeTrackColor = Color(0xFF8B5CF6),
+                inactiveTrackColor = Color.White.copy(alpha = 0.25f)
             ),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).height(20.dp)
         )
         Spacer(Modifier.width(8.dp))
         Text(
             text = formatMs(durationMs),
-            color = Color.White,
-            fontSize = 13.sp,
+            color = Color.White.copy(alpha = 0.75f),
+            fontSize = 12.sp,
             modifier = Modifier.widthIn(min = 48.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.End
         )

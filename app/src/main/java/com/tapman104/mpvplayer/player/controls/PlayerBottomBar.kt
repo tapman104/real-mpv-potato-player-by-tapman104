@@ -25,11 +25,11 @@ fun PlayerBottomBar(
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f))
                 )
             )
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp, vertical = 16.dp)
+            .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         PlayerSeekBar(
             currentPositionMs = currentPositionMs,
@@ -39,7 +39,7 @@ fun PlayerBottomBar(
             onDraggingChange = onDraggingChange,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(4.dp))
         PlayPauseButton(
             isPlaying = isPlaying,
             onToggle = onTogglePlay,
