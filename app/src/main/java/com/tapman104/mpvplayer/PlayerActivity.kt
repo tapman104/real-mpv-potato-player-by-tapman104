@@ -22,6 +22,7 @@ import com.tapman104.mpvplayer.settings.SettingsScreen
 import com.tapman104.mpvplayer.ui.theme.MpvPlayerTheme
 import com.tapman104.mpvplayer.player.viewmodel.PlayerViewModel
 import com.tapman104.mpvplayer.player.viewmodel.PlayerViewModelFactory
+import com.tapman104.mpvplayer.core.preferences.UserPreferencesRepository
 
 class PlayerActivity : ComponentActivity() {
 
@@ -144,9 +145,24 @@ class PlayerActivity : ComponentActivity() {
                 )
 
                 if (showSettings) {
+                    val subtitleSize by viewModel.subtitleSize.collectAsStateWithLifecycle(
+                        initialValue = UserPreferencesRepository.DEFAULT_SUBTITLE_SIZE
+                    )
+                    val subtitlePosition by viewModel.subtitlePosition.collectAsStateWithLifecycle(
+                        initialValue = UserPreferencesRepository.DEFAULT_SUBTITLE_POSITION
+                    )
+                    val resumePlayback by viewModel.resumePlayback.collectAsStateWithLifecycle(
+                        initialValue = UserPreferencesRepository.DEFAULT_RESUME_PLAYBACK
+                    )
                     SettingsScreen(
                         preferredSubtitleLang = preferredSubtitleLang,
                         onSubtitleLangChange = { viewModel.setPreferredSubtitleLanguage(it) },
+                        subtitleSize = subtitleSize,
+                        subtitlePosition = subtitlePosition,
+                        onSubtitleSizeChange = { viewModel.setSubtitleSize(it) },
+                        onSubtitlePositionChange = { viewModel.setSubtitlePosition(it) },
+                        resumePlayback = resumePlayback,
+                        onResumePlaybackChange = { viewModel.setResumePlayback(it) },
                         onBack = { showSettings = false }
                     )
                 }

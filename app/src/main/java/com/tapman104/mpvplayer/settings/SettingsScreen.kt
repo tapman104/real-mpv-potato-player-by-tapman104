@@ -1,4 +1,4 @@
-﻿package com.tapman104.mpvplayer.settings
+package com.tapman104.mpvplayer.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,6 +8,8 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,6 +23,12 @@ import androidx.compose.ui.unit.sp
 fun SettingsScreen(
     preferredSubtitleLang: String,
     onSubtitleLangChange: (String) -> Unit,
+    subtitleSize: Float,
+    subtitlePosition: Float,
+    onSubtitleSizeChange: (Float) -> Unit,
+    onSubtitlePositionChange: (Float) -> Unit,
+    resumePlayback: Boolean,
+    onResumePlaybackChange: (Boolean) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -92,15 +100,22 @@ fun SettingsScreen(
 
         HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
 
-        // Section: About
+        SubtitleAppearanceSection(
+            subtitleSize = subtitleSize,
+            subtitlePosition = subtitlePosition,
+            onSizeChange = onSubtitleSizeChange,
+            onPositionChange = onSubtitlePositionChange
+        )
+
+        // Section: Playback
         Text(
-            text = "About",
+            text = "Playback",
             color = Color.White.copy(alpha = 0.4f),
             fontSize = 11.sp,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
         )
 
-        // App Version row
+        // Resume Playback toggle row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,38 +123,20 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "App Version",
-                color = Color.White,
-                fontSize = 15.sp
-            )
-            Text(
-                text = "1.0",
-                color = Color.White.copy(alpha = 0.4f),
-                fontSize = 13.sp
+            Text("Resume Playback", color = Color.White, fontSize = 15.sp)
+            Switch(
+                checked = resumePlayback,
+                onCheckedChange = onResumePlaybackChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = Color(0xFF8B5CF6),
+                    uncheckedTrackColor = Color.White.copy(alpha = 0.2f)
+                )
             )
         }
 
         HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
 
-        // MPV Library row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "MPV Library",
-                color = Color.White,
-                fontSize = 15.sp
-            )
-            Text(
-                text = "libmpv",
-                color = Color.White.copy(alpha = 0.4f),
-                fontSize = 13.sp
-            )
-        }
+        AboutSection()
     }
 }

@@ -39,8 +39,14 @@ class MainActivity : ComponentActivity() {
 
                 if (showSettings) {
                     SettingsScreen(
-                        preferredSubtitleLang = "eng", // TODO: wire ViewModel
-                        onSubtitleLangChange = {},     // TODO: wire ViewModel
+                        preferredSubtitleLang = "eng",       // TODO: wire ViewModel
+                        onSubtitleLangChange = {},            // TODO: wire ViewModel
+                        subtitleSize = 1.0f,                  // TODO: wire ViewModel
+                        subtitlePosition = 0.1f,              // TODO: wire ViewModel
+                        onSubtitleSizeChange = {},            // TODO: wire ViewModel
+                        onSubtitlePositionChange = {},        // TODO: wire ViewModel
+                        resumePlayback = true,                // TODO: wire ViewModel
+                        onResumePlaybackChange = {},          // TODO: wire ViewModel
                         onBack = { showSettings = false }
                     )
                 }

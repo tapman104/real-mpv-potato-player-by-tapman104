@@ -55,6 +55,14 @@ class PlayerViewModel(
     private val _preferredSubtitleLang = MutableStateFlow(UserPreferencesRepository.DEFAULT_SUBTITLE_LANGUAGE)
     val preferredSubtitleLang: StateFlow<String> = _preferredSubtitleLang.asStateFlow()
 
+    // ---------------------------------------------------------------------------
+    // Settings preferences (subtitle size/position, resume playback)
+    // ---------------------------------------------------------------------------
+
+    val subtitleSize = userPreferencesRepository.subtitleSize
+    val subtitlePosition = userPreferencesRepository.subtitlePosition
+    val resumePlayback = userPreferencesRepository.resumePlayback
+
     init {
         controller.dispatcher.addListener(this)
         controller.init()
@@ -397,6 +405,24 @@ class PlayerViewModel(
     fun setPreferredSubtitleLanguage(lang: String) {
         viewModelScope.launch {
             userPreferencesRepository.setSubtitleLanguage(lang)
+        }
+    }
+
+    fun setSubtitleSize(size: Float) {
+        viewModelScope.launch {
+            userPreferencesRepository.setSubtitleSize(size)
+        }
+    }
+
+    fun setSubtitlePosition(position: Float) {
+        viewModelScope.launch {
+            userPreferencesRepository.setSubtitlePosition(position)
+        }
+    }
+
+    fun setResumePlayback(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.setResumePlayback(enabled)
         }
     }
 
