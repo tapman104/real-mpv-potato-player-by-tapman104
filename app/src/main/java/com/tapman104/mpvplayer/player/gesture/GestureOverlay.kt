@@ -149,27 +149,6 @@ fun GestureOverlay(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalSwipeGesture(
-                    activity = activity,
-                    audioManager = audioManager,
-                    onVolumeChange = {
-                        showVolume = true
-                        volumePercent = it
-                    },
-                    onBrightnessChange = {
-                        showBrightness = true
-                        brightnessPercent = it
-                    },
-                    onSwipeStart = { isVerticalGestureActiveLocal = true },
-                    onVolumeSwipeEnd = {
-                        volumeHideTrigger++
-                        isVerticalGestureActiveLocal = false
-                    },
-                    onBrightnessSwipeEnd = {
-                        brightnessHideTrigger++
-                        isVerticalGestureActiveLocal = false
-                    }
-                )
                 .tapGesture(
                     onToggleControls = onToggleControls,
                     onSeekForward = onSeekForward,
@@ -218,6 +197,44 @@ fun GestureOverlay(
                     onPanChange = onPanChange,
                 )
         ) {
+            // The side-detection logic (firstDown.position.x > size.width / 2) stays in GestureOverlay.kt
+            // — it decides which modifier to apply structurally by splitting the screen.
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .brightnessGesture(
+                            activity = activity,
+                            onBrightnessChange = {
+                                showBrightness = true
+                                brightnessPercent = it
+                            },
+                            onSwipeStart = { isVerticalGestureActiveLocal = true },
+                            onBrightnessSwipeEnd = {
+                                brightnessHideTrigger++
+                                isVerticalGestureActiveLocal = false
+                            }
+                        )
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .volumeGesture(
+                            audioManager = audioManager,
+                            onVolumeChange = {
+                                showVolume = true
+                                volumePercent = it
+                            },
+                            onSwipeStart = { isVerticalGestureActiveLocal = true },
+                            onVolumeSwipeEnd = {
+                                volumeHideTrigger++
+                                isVerticalGestureActiveLocal = false
+                            }
+                        )
+                )
+            }
             val displayLabel = if (isLongPressing) "2×" else seekLabel
 
             if (displayLabel.isNotEmpty()) {

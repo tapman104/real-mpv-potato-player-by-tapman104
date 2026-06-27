@@ -1,8 +1,6 @@
 package com.tapman104.mpvplayer.player.gesture
 
-import android.app.Activity
 import android.media.AudioManager
-import android.provider.Settings
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.getValue
@@ -13,30 +11,20 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationException
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.platform.LocalContext
 import kotlin.math.roundToInt
 
-fun Modifier.verticalSwipeGesture(
-    activity: Activity?,
+fun Modifier.volumeGesture(
     audioManager: AudioManager,
     onVolumeChange: (percent: Int) -> Unit,
-    onBrightnessChange: (percent: Int) -> Unit,
     onSwipeStart: () -> Unit,
     onVolumeSwipeEnd: () -> Unit,
-    onBrightnessSwipeEnd: () -> Unit,
 ): Modifier = composed {
-    val context = LocalContext.current
-    val currentActivity by rememberUpdatedState(activity)
     val currentAudioManager by rememberUpdatedState(audioManager)
     val currentOnVolumeChange by rememberUpdatedState(onVolumeChange)
-    val currentOnBrightnessChange by rememberUpdatedState(onBrightnessChange)
     val currentOnSwipeStart by rememberUpdatedState(onSwipeStart)
     val currentOnVolumeSwipeEnd by rememberUpdatedState(onVolumeSwipeEnd)
-    val currentOnBrightnessSwipeEnd by rememberUpdatedState(onBrightnessSwipeEnd)
 
     pointerInput(Unit) {
-        var lastKnownBrightness = -1f
-        
         awaitEachGesture {
             val firstDown = awaitFirstDown(requireUnconsumed = false)
             if (firstDown.isConsumed) return@awaitEachGesture
@@ -77,28 +65,11 @@ fun Modifier.verticalSwipeGesture(
 
             if (isDragging) {
                 firstDown.consume()
-                val isRightSide = firstDown.position.x > size.width / 2
+
                 var currentVolume = currentAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
                 val maxVol = currentAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
 
-                var currentBrightness = currentActivity?.window?.attributes?.screenBrightness ?: -1f
-                if (currentBrightness < 0f) {
-                    currentBrightness = if (lastKnownBrightness >= 0f) {
-                        lastKnownBrightness
-                    } else {
-                        try {
-                            Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS) / 255f
-                        } catch (e: Exception) {
-                            0.5f
-                        }
-                    }
-                }
-
-                if (isRightSide) {
-                    currentOnVolumeChange(((currentVolume / maxVol) * 100).toInt())
-                } else {
-                    currentOnBrightnessChange((currentBrightness * 100).toInt())
-                }
+                currentOnVolumeChange(((currentVolume / maxVol) * 100).toInt())
                 currentOnSwipeStart()
 
                 while (true) {
@@ -110,27 +81,14 @@ fun Modifier.verticalSwipeGesture(
                     val dy = change.positionChange().y
                     val fraction = -dy / size.height
 
-                    if (isRightSide) {
-                        currentVolume += fraction * maxVol * 1.5f
-                        currentVolume = currentVolume.coerceIn(0f, maxVol)
-                        currentAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume.roundToInt(), 0)
-                        currentOnVolumeChange(((currentVolume / maxVol) * 100).toInt())
-                    } else {
-                        currentBrightness += fraction * 1.5f
-                        currentBrightness = currentBrightness.coerceIn(0.01f, 1f)
-                        currentActivity?.window?.attributes = currentActivity?.window?.attributes?.apply {
-                            screenBrightness = currentBrightness
-                        }
-                        currentOnBrightnessChange((currentBrightness * 100).toInt())
-                    }
+                    currentVolume += fraction * maxVol * 1.5f
+                    currentVolume = currentVolume.coerceIn(0f, maxVol)
+                    currentAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume.roundToInt(), 0)
+                    currentOnVolumeChange(((currentVolume / maxVol) * 100).toInt())
+                    
                     change.consume()
                 }
-                if (isRightSide) {
-                    currentOnVolumeSwipeEnd()
-                } else {
-                    currentOnBrightnessSwipeEnd()
-                }
-                lastKnownBrightness = currentBrightness
+                currentOnVolumeSwipeEnd()
             }
         }
     }
