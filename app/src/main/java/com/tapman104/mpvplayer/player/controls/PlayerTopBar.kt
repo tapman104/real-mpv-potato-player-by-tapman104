@@ -137,7 +137,7 @@ fun PlayerTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF8B5CF6),
+                    tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
             }
