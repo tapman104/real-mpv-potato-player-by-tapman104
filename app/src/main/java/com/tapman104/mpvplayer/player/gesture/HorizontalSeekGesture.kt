@@ -16,12 +16,13 @@ private fun formatMs(ms: Long): String {
 
 /**
  * Recognises a single-finger horizontal drag as a seek gesture.
- * Activation requires: |dx| > 30px AND |dx| > |dy|*2 AND held > 100ms.
+ * Activation requires: |dx| > 30px AND |dx| > |dy|*2 AND held > 100ms AND not long-pressing.
  * Cancels on multi-finger contact.
  */
 fun Modifier.horizontalSeekGesture(
     isEnabled: Boolean,
     isVerticalGestureActive: Boolean,
+    isLongPressing: Boolean = false,
     currentPositionMs: Long,
     durationMs: Long,
     onSeekStart: () -> Unit,
@@ -33,7 +34,7 @@ fun Modifier.horizontalSeekGesture(
 ): Modifier = composed {
     val currentPositionMsState = rememberUpdatedState(currentPositionMs)
     val durationMsState = rememberUpdatedState(durationMs)
-    pointerInput(isEnabled, isVerticalGestureActive) {
+    pointerInput(isEnabled, isVerticalGestureActive, isLongPressing) {
         if (!isEnabled || isVerticalGestureActive) return@pointerInput
         awaitEachGesture {
             val firstDown = awaitFirstDown(requireUnconsumed = false)
@@ -65,8 +66,8 @@ fun Modifier.horizontalSeekGesture(
                 val elapsed = System.currentTimeMillis() - downTime
 
                 if (!seekActive) {
-                    // Activation condition
-                    if (abs(deltaX) > 30f && abs(deltaX) > abs(deltaY) * 2f && elapsed > 100) {
+                    // Activation condition — also blocked while a long-press is active
+                    if (abs(deltaX) > 30f && abs(deltaX) > abs(deltaY) * 2f && elapsed > 100 && !isLongPressing) {
                         seekActive = true
                         initialPositionMs = currentPositionMsState.value
                         onSeekStart()

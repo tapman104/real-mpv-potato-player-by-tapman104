@@ -91,6 +91,11 @@ fun Modifier.brightnessGesture(
 
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Main)
+                    // Cancel if a second finger lands — let pinch take over
+                    if (event.changes.count { it.pressed } > 1) {
+                        currentOnBrightnessSwipeEnd()
+                        break
+                    }
                     val change = event.changes.firstOrNull { it.id == firstDown.id }
                     if (change == null || !change.pressed) break
                     if (change.isConsumed) break

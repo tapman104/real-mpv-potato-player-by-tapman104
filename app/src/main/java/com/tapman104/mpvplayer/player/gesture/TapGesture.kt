@@ -10,6 +10,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationException
 import androidx.compose.ui.input.pointer.pointerInput
+import kotlin.math.sqrt
 
 fun Modifier.tapGesture(
     onToggleControls: () -> Unit,
@@ -64,7 +65,8 @@ fun Modifier.tapGesture(
                         }
                         val dy = change.position.y - firstDown.position.y
                         val dx = change.position.x - firstDown.position.x
-                        if (kotlin.math.abs(dy) > 20f && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
+                        val distance = sqrt(dx * dx + dy * dy)
+                        if (distance > 10f && kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
                             isDragging = true
                             break
                         } else if (kotlin.math.abs(dx) > 20f) {

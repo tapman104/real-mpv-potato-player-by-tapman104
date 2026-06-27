@@ -196,6 +196,8 @@ fun GestureOverlay(
                 .horizontalSeekGesture(
                     isEnabled = true,
                     isVerticalGestureActive = isVerticalGestureActiveLocal,
+                    // isLongPressing = false resets before awaitEachGesture restarts (onLongPressEnd fires first)
+                    isLongPressing = isLongPressing,
                     currentPositionMs = currentPositionMs,
                     durationMs = durationMs,
                     onSeekStart = onPauseForSeek,
