@@ -132,13 +132,13 @@ fun PlayerTopBar(
         ) {
             IconButton(
                 onClick = onBack,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    tint = Color(0xFF8B5CF6),
+                    modifier = Modifier.size(24.dp)
                 )
             }
             Spacer(Modifier.width(8.dp))
@@ -156,37 +156,37 @@ fun PlayerTopBar(
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = { showAudioDialog = true },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Audiotrack,
                     contentDescription = "Audio track",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    tint = Color(0xFF8B5CF6),
+                    modifier = Modifier.size(24.dp)
                 )
             }
             IconButton(
                 onClick = { showSubtitleDialog = true },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.ClosedCaption,
                     contentDescription = "Subtitle track",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    tint = Color(0xFF8B5CF6),
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
             // Decode mode button removed
             IconButton(
                 onClick = { showMoreOptionsDialog = true },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(40.dp)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.MoreVert,
                     contentDescription = "More options",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    tint = Color(0xFF8B5CF6),
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
