@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.tapman104.mpvplayer.core.preferences.SubtitlePreferences
 import com.tapman104.mpvplayer.core.database.ResumePositionDao
 import com.tapman104.mpvplayer.core.database.ResumePositionEntity
 import com.tapman104.mpvplayer.core.preferences.UserPreferencesRepository
@@ -80,8 +79,8 @@ class PlayerViewModel(
         // Load persisted subtitle appearance preferences and apply them immediately.
         viewModelScope.launch {
             combine(
-                SubtitlePreferences.sizeFlow(context),
-                SubtitlePreferences.positionFlow(context)
+                userPreferencesRepository.subtitleSize,
+                userPreferencesRepository.subtitlePosition
             ) { size, position -> Pair(size, position) }
                 .collect { (size, position) ->
                     _playerState.update { it.copy(subtitleSize = size, subtitlePosition = position) }
@@ -333,17 +332,19 @@ class PlayerViewModel(
         _playerState.update { it.copy(subtitleSize = size, subtitlePosition = position) }
         controller.executor.setSubtitleAppearance(size, position)
         viewModelScope.launch {
-            SubtitlePreferences.save(context, size, position)
+            userPreferencesRepository.setSubtitleSize(size)
+            userPreferencesRepository.setSubtitlePosition(position)
         }
     }
 
     fun resetSubtitleAppearance() {
-        val size = SubtitlePreferences.DEFAULT_SIZE
-        val position = SubtitlePreferences.DEFAULT_POSITION
+        val size = UserPreferencesRepository.DEFAULT_SUBTITLE_SIZE
+        val position = UserPreferencesRepository.DEFAULT_SUBTITLE_POSITION
         _playerState.update { it.copy(subtitleSize = size, subtitlePosition = position) }
         controller.executor.setSubtitleAppearance(size, position)
         viewModelScope.launch {
-            SubtitlePreferences.reset(context)
+            userPreferencesRepository.setSubtitleSize(size)
+            userPreferencesRepository.setSubtitlePosition(position)
         }
     }
 

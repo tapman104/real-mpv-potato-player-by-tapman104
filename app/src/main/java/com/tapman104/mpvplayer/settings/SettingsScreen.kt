@@ -79,7 +79,7 @@ fun SettingsScreen(
                 .fillMaxWidth()
                 .clickable {
                     val currentIndex = subtitleLangs.indexOf(preferredSubtitleLang)
-                    val nextIndex = if (currentIndex < 0) 1 else (currentIndex + 1) % subtitleLangs.size
+                    val nextIndex = if (currentIndex < 0) 0 else (currentIndex + 1) % subtitleLangs.size
                     onSubtitleLangChange(subtitleLangs[nextIndex])
                 }
                 .padding(horizontal = 20.dp, vertical = 14.dp),
