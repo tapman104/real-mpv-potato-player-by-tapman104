@@ -40,6 +40,7 @@ fun PlayerScreen(
     onPanChange: (Float, Float) -> Unit = { _, _ -> },
     onDecodeModeChange: (com.tapman104.mpvplayer.player.model.DecodeMode) -> Unit = {},
     onAspectRatioChange: (com.tapman104.mpvplayer.player.model.AspectRatioMode) -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
@@ -101,6 +102,7 @@ fun PlayerScreen(
             onDecodeModeChange = onDecodeModeChange,
             onAspectRatioChange = onAspectRatioChange,
             onAutoSelectSubtitle = onAutoSelectSubtitle,
+            onSettingsClick = onSettingsClick,
             modifier = Modifier.fillMaxSize()
         )
     }

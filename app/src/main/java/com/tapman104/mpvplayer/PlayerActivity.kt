@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tapman104.mpvplayer.player.playback.PlayerScreen
+import com.tapman104.mpvplayer.settings.SettingsScreen
 import com.tapman104.mpvplayer.ui.theme.MpvPlayerTheme
 import com.tapman104.mpvplayer.player.viewmodel.PlayerViewModel
 import com.tapman104.mpvplayer.player.viewmodel.PlayerViewModelFactory
@@ -82,11 +83,13 @@ class PlayerActivity : ComponentActivity() {
             MpvPlayerTheme {
                 val playerState by viewModel.playerState.collectAsStateWithLifecycle()
                 val playlistState by viewModel.playlistState.collectAsStateWithLifecycle()
+                val preferredSubtitleLang by viewModel.preferredSubtitleLang.collectAsStateWithLifecycle()
 
                 // Hoist resume dialog state into Compose
                 var showResume by remember { mutableStateOf(false) }
                 var resumeMs by remember { mutableStateOf(0L) }
                 var preOverrideSpeed by remember { mutableFloatStateOf(1f) }
+                var showSettings by remember { mutableStateOf(false) }
 
                 // Save position whenever playback pauses (isPlaying flips to false)
                 val isPlaying = playerState.isPlaying
@@ -136,8 +139,17 @@ class PlayerActivity : ComponentActivity() {
                     onZoomChange = { viewModel.setVideoZoom(it) },
                     onPanChange = { x, y -> viewModel.setVideoPan(x, y) },
                     onDecodeModeChange = { viewModel.setDecodeMode(it) },
-                    onAspectRatioChange = { viewModel.setAspectRatio(it) }
+                    onAspectRatioChange = { viewModel.setAspectRatio(it) },
+                    onSettingsClick = { showSettings = true }
                 )
+
+                if (showSettings) {
+                    SettingsScreen(
+                        preferredSubtitleLang = preferredSubtitleLang,
+                        onSubtitleLangChange = { viewModel.setPreferredSubtitleLanguage(it) },
+                        onBack = { showSettings = false }
+                    )
+                }
             }
         }
 

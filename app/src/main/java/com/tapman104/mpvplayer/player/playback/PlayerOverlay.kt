@@ -44,6 +44,7 @@ fun PlayerOverlay(
     onAspectRatioChange: (com.tapman104.mpvplayer.player.model.AspectRatioMode) -> Unit,
     // Auto-subtitle
     onAutoSelectSubtitle: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showSubtitleAppearance by remember { mutableStateOf(false) }
@@ -121,7 +122,8 @@ fun PlayerOverlay(
                 onDecodeModeChange = onDecodeModeChange,
                 currentAspectRatio = playerState.aspectRatio,
                 onAspectRatioClick = { showAspectRatioDialog = true },
-                onDialogOpenChange = { isTopBarDialogOpen = it }
+                onDialogOpenChange = { isTopBarDialogOpen = it },
+                onSettingsClick = onSettingsClick
             )
         }
 

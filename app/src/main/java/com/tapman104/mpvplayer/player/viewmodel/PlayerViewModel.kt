@@ -394,6 +394,12 @@ class PlayerViewModel(
         }
     }
 
+    fun setPreferredSubtitleLanguage(lang: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.setSubtitleLanguage(lang)
+        }
+    }
+
 
     // ---------------------------------------------------------------------------
     // MpvEventListener

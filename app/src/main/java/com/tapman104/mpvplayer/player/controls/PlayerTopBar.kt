@@ -54,6 +54,7 @@ fun PlayerTopBar(
     currentAspectRatio: com.tapman104.mpvplayer.player.model.AspectRatioMode,
     onAspectRatioClick: () -> Unit = {},
     onDialogOpenChange: (Boolean) -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showAudioDialog by remember { mutableStateOf(false) }
@@ -99,7 +100,8 @@ fun PlayerTopBar(
             onPlaybackSpeed = { showMoreOptionsDialog = false; showSpeedDialog = true },
             onLoopRepeat = { showMoreOptionsDialog = false },
             onAspectRatio = { showMoreOptionsDialog = false; onAspectRatioClick() },
-            onDismiss = { showMoreOptionsDialog = false }
+            onDismiss = { showMoreOptionsDialog = false },
+            onSettings = onSettingsClick
         )
     }
 

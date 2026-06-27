@@ -6,8 +6,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
 import androidx.core.view.WindowCompat
 import com.tapman104.mpvplayer.home.ui.HomeScreen
+import com.tapman104.mpvplayer.settings.SettingsScreen
 import com.tapman104.mpvplayer.ui.theme.MpvPlayerTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +30,20 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             MpvPlayerTheme {
-                HomeScreen(onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) })
+                var showSettings by remember { mutableStateOf(false) }
+
+                HomeScreen(
+                    onOpenFile = { filePickerLauncher.launch(arrayOf("video/*")) },
+                    onSettingsClick = { showSettings = true }
+                )
+
+                if (showSettings) {
+                    SettingsScreen(
+                        preferredSubtitleLang = "eng", // TODO: wire ViewModel
+                        onSubtitleLangChange = {},     // TODO: wire ViewModel
+                        onBack = { showSettings = false }
+                    )
+                }
             }
         }
     }

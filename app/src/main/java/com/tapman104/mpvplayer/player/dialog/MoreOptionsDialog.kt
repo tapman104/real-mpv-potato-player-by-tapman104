@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +30,8 @@ fun MoreOptionsDialog(
     onPlaybackSpeed: () -> Unit,
     onLoopRepeat: () -> Unit,
     onAspectRatio: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onSettings: () -> Unit = {}
 ) {
     androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismiss,
@@ -130,6 +132,15 @@ fun MoreOptionsDialog(
                                     com.tapman104.mpvplayer.player.model.DecodeMode.SW -> com.tapman104.mpvplayer.player.model.DecodeMode.HW
                                 }
                                 onDecodeModeChange(nextMode)
+                            }
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        MoreOptionsRow(
+                            icon = Icons.Rounded.Settings,
+                            label = "Settings",
+                            onClick = {
+                                onSettings()
+                                onDismiss()
                             }
                         )
                     }
