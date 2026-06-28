@@ -7,9 +7,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tapman104.mpvplayer.core.preferences.UserPreferencesRepository
 import com.tapman104.mpvplayer.home.ui.HomeScreen
 import com.tapman104.mpvplayer.settings.SettingsScreen
+import com.tapman104.mpvplayer.settings.SettingsViewModel
+import com.tapman104.mpvplayer.settings.SettingsViewModelFactory
 import com.tapman104.mpvplayer.ui.theme.MpvPlayerTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,15 +43,25 @@ class MainActivity : ComponentActivity() {
                 )
 
                 if (showSettings) {
+                    val context = LocalContext.current
+                    val settingsViewModel: SettingsViewModel = viewModel(
+                        factory = SettingsViewModelFactory(UserPreferencesRepository(context.applicationContext))
+                    )
+                    
+                    val preferredSubtitleLang by settingsViewModel.subtitleLanguage.collectAsState()
+                    val subtitleSize by settingsViewModel.subtitleSize.collectAsState()
+                    val subtitlePosition by settingsViewModel.subtitlePosition.collectAsState()
+                    val resumePlayback by settingsViewModel.resumePlayback.collectAsState()
+
                     SettingsScreen(
-                        preferredSubtitleLang = "eng",       // TODO: wire ViewModel
-                        onSubtitleLangChange = {},            // TODO: wire ViewModel
-                        subtitleSize = 1.0f,                  // TODO: wire ViewModel
-                        subtitlePosition = 0.1f,              // TODO: wire ViewModel
-                        onSubtitleSizeChange = {},            // TODO: wire ViewModel
-                        onSubtitlePositionChange = {},        // TODO: wire ViewModel
-                        resumePlayback = true,                // TODO: wire ViewModel
-                        onResumePlaybackChange = {},          // TODO: wire ViewModel
+                        preferredSubtitleLang = preferredSubtitleLang,
+                        onSubtitleLangChange = { settingsViewModel.setSubtitleLanguage(it) },
+                        subtitleSize = subtitleSize,
+                        subtitlePosition = subtitlePosition,
+                        onSubtitleSizeChange = { settingsViewModel.setSubtitleSize(it) },
+                        onSubtitlePositionChange = { settingsViewModel.setSubtitlePosition(it) },
+                        resumePlayback = resumePlayback,
+                        onResumePlaybackChange = { settingsViewModel.setResumePlayback(it) },
                         onBack = { showSettings = false }
                     )
                 }

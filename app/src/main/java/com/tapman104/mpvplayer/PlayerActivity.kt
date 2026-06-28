@@ -86,9 +86,11 @@ class PlayerActivity : ComponentActivity() {
                 val playlistState by viewModel.playlistState.collectAsStateWithLifecycle()
                 val preferredSubtitleLang by viewModel.preferredSubtitleLang.collectAsStateWithLifecycle()
 
-                // Hoist resume dialog state into Compose
-                var showResume by remember { mutableStateOf(false) }
-                var resumeMs by remember { mutableStateOf(0L) }
+                val resumePlaybackPref by viewModel.resumePlayback.collectAsStateWithLifecycle(
+                    initialValue = UserPreferencesRepository.DEFAULT_RESUME_PLAYBACK
+                )
+
+                var pendingResumeMs by remember { mutableStateOf(0L) }
                 var preOverrideSpeed by remember { mutableFloatStateOf(1f) }
                 var showSettings by remember { mutableStateOf(false) }
 
@@ -107,8 +109,18 @@ class PlayerActivity : ComponentActivity() {
                     val uriStr = playlistState.currentUri ?: return@LaunchedEffect
                     currentFilePath = uriStr
                     viewModel.loadResumePosition(uriStr) { savedMs ->
-                        resumeMs = savedMs ?: 0L
-                        showResume = (savedMs != null && savedMs > 5000L)
+                        if (savedMs != null && savedMs > 5000L && resumePlaybackPref) {
+                            pendingResumeMs = savedMs
+                        } else {
+                            pendingResumeMs = 0L
+                        }
+                    }
+                }
+
+                LaunchedEffect(playerState.isLoading, pendingResumeMs) {
+                    if (!playerState.isLoading && pendingResumeMs > 0L) {
+                        viewModel.seekTo(pendingResumeMs)
+                        pendingResumeMs = 0L
                     }
                 }
 
