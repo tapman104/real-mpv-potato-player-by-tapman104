@@ -76,10 +76,9 @@ fun Modifier.horizontalSeekGesture(
 
                 if (seekActive) {
                     change.consume()
-                    val effectiveSensitivity = if (sensitivityPx > 0f) sensitivityPx else size.width.toFloat()
+                    val msPerPx = if (sensitivityPx > 0f) sensitivityPx else 300f
                     val dur = durationMsState.value
-                    val factor = if (dur > 0) dur.toFloat() / effectiveSensitivity else 1f
-                    val targetMs = (initialPositionMs + (deltaX * factor).toLong())
+                    val targetMs = (initialPositionMs + (deltaX * msPerPx).toLong())
                         .coerceIn(0L, dur)
                     onSeekTo(targetMs)
                     val deltaMs = targetMs - initialPositionMs
