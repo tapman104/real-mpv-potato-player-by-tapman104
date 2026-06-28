@@ -328,7 +328,9 @@ fun GestureOverlay(
                         scaleIn(tween(200, easing = FastOutSlowInEasing), initialScale = 0.7f),
                 exit = fadeOut(tween(200)) +
                         scaleOut(tween(200), targetScale = 0.85f),
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 48.dp)
             ) {
                 SpeedIndicator()
             }
@@ -449,7 +451,7 @@ private fun SpeedIndicator() {
                     )
                 )
             )
-            .padding(horizontal = 24.dp, vertical = 14.dp)
+            .padding(horizontal = 18.dp, vertical = 10.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -459,12 +461,12 @@ private fun SpeedIndicator() {
                 imageVector = Icons.Rounded.Speed,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(20.dp)
             )
             Text(
                 text = "2×  Speed",
                 color = Color.White,
-                fontSize = 18.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
             )
         }
