@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,7 +66,7 @@ fun MoreOptionsDialog(
                     topEnd = 0.dp,
                     bottomEnd = 0.dp
                 ),
-                color = Color(0xFF1A1A1A),
+                color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp
             ) {
                 Column(
@@ -75,7 +76,7 @@ fun MoreOptionsDialog(
                 ) {
                     Text(
                         text = "More Options",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Medium,
                         fontSize = 17.sp,
                         modifier = Modifier.padding(bottom = 24.dp)
@@ -90,7 +91,7 @@ fun MoreOptionsDialog(
                                 onDismiss()
                             }
                         )
-                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f), thickness = 0.5.dp)
                         MoreOptionsRow(
                             icon = Icons.Filled.Speed,
                             label = "Playback Speed",
@@ -99,7 +100,7 @@ fun MoreOptionsDialog(
                                 onDismiss()
                             }
                         )
-                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f), thickness = 0.5.dp)
                         MoreOptionsRow(
                             icon = Icons.Filled.Loop,
                             label = "Loop / Repeat",
@@ -108,7 +109,7 @@ fun MoreOptionsDialog(
                                 onDismiss()
                             }
                         )
-                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f), thickness = 0.5.dp)
                         MoreOptionsRow(
                             icon = Icons.Filled.AspectRatio,
                             label = "Aspect Ratio: ${currentAspectRatio.displayName}",
@@ -117,7 +118,7 @@ fun MoreOptionsDialog(
                                 onDismiss()
                             }
                         )
-                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f), thickness = 0.5.dp)
                         MoreOptionsRow(
                             icon = Icons.Filled.Speed, // Using Speed icon as a fallback, ideally a Memory icon
                             label = "Decoder: ${when(currentDecodeMode) {
@@ -134,7 +135,7 @@ fun MoreOptionsDialog(
                                 onDecodeModeChange(nextMode)
                             }
                         )
-                        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f), thickness = 0.5.dp)
                         MoreOptionsRow(
                             icon = Icons.Rounded.Settings,
                             label = "Settings",
@@ -151,7 +152,7 @@ fun MoreOptionsDialog(
                         onClick = onDismiss,
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text("Close", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
+                        Text("Close", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f), fontSize = 13.sp)
                     }
                 }
             }
@@ -176,13 +177,13 @@ private fun MoreOptionsRow(
             modifier = Modifier
                 .size(36.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(Color.White.copy(alpha = 0.05f)),
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = Color.White.copy(alpha = 0.7f),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.size(17.dp)
             )
         }
@@ -190,7 +191,7 @@ private fun MoreOptionsRow(
         Text(
             text = label,
             fontSize = 14.sp,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

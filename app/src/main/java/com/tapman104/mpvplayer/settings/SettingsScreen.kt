@@ -11,6 +11,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +36,7 @@ fun SettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF0F0F0F))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Top bar
         Row(
@@ -49,25 +50,25 @@ fun SettingsScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Settings",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Medium
             )
         }
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.06f), thickness = 0.5.dp)
 
         // Section: Subtitles
         Text(
             text = "Subtitles",
-            color = Color.White.copy(alpha = 0.4f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
             fontSize = 11.sp,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
         )
@@ -88,17 +89,17 @@ fun SettingsScreen(
         ) {
             Text(
                 text = "Preferred Subtitle Language",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 15.sp
             )
             Text(
                 text = preferredSubtitleLang,
-                color = Color(0xFF8B5CF6),
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 13.sp
             )
         }
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.06f), thickness = 0.5.dp)
 
         SubtitleAppearanceSection(
             subtitleSize = subtitleSize,
@@ -110,7 +111,7 @@ fun SettingsScreen(
         // Section: Playback
         Text(
             text = "Playback",
-            color = Color.White.copy(alpha = 0.4f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
             fontSize = 11.sp,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
         )
@@ -123,19 +124,19 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Resume Playback", color = Color.White, fontSize = 15.sp)
+            Text("Resume Playback", color = MaterialTheme.colorScheme.onBackground, fontSize = 15.sp)
             Switch(
                 checked = resumePlayback,
                 onCheckedChange = onResumePlaybackChange,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = Color(0xFF8B5CF6),
-                    uncheckedTrackColor = Color.White.copy(alpha = 0.2f)
+                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
                 )
             )
         }
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
+        HorizontalDivider(color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.06f), thickness = 0.5.dp)
 
         AboutSection()
     }
