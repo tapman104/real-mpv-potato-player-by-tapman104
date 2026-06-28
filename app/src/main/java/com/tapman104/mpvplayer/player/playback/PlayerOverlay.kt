@@ -3,18 +3,23 @@ package com.tapman104.mpvplayer.player.playback
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tapman104.mpvplayer.player.state.PlayerState
@@ -52,8 +57,17 @@ fun PlayerOverlay(
     var showAspectRatioDialog by remember { mutableStateOf(false) }
     var isDraggingSeekbar by remember { mutableStateOf(false) }
     var isTopBarDialogOpen by remember { mutableStateOf(false) }
+    var aspectRatioFlashLabel by remember { mutableStateOf("") }
+    var aspectRatioFlashTrigger by remember { mutableIntStateOf(0) }
 
     val isAnyDialogOpen = isTopBarDialogOpen || showSubtitleAppearance || showAspectRatioDialog
+
+    LaunchedEffect(aspectRatioFlashTrigger) {
+        if (aspectRatioFlashTrigger > 0) {
+            delay(150)
+            aspectRatioFlashLabel = ""
+        }
+    }
 
     LaunchedEffect(controlsVisible, isDraggingSeekbar, isAnyDialogOpen) {
         if (controlsVisible && !isDraggingSeekbar && !isAnyDialogOpen) {
@@ -144,9 +158,11 @@ fun PlayerOverlay(
                 onDraggingChange = { isDraggingSeekbar = it },
                 currentAspectRatio = playerState.aspectRatio,
                 onAspectRatioCycle = {
-                    val modes = AspectRatioMode.entries
+                    val modes = com.tapman104.mpvplayer.player.model.AspectRatioMode.entries
                     val next = modes[(modes.indexOf(playerState.aspectRatio) + 1) % modes.size]
                     onAspectRatioChange(next)
+                    aspectRatioFlashLabel = next.displayName
+                    aspectRatioFlashTrigger++
                 }
             )
         }
@@ -166,6 +182,20 @@ fun PlayerOverlay(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(16.dp)
+            )
+        }
+
+        if (aspectRatioFlashLabel.isNotEmpty()) {
+            Text(
+                text = aspectRatioFlashLabel,
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Black.copy(alpha = 0.55f))
+                    .padding(horizontal = 24.dp, vertical = 12.dp)
             )
         }
 
