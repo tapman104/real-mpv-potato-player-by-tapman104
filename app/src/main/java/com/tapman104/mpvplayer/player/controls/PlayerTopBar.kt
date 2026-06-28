@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Audiotrack
 import androidx.compose.material.icons.rounded.ClosedCaption
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -198,7 +200,37 @@ fun PlayerTopBar(
             }
             Spacer(Modifier.width(12.dp))
 
-            // Decode mode button removed
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.15f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = LocalIndication.current
+                    ) {
+                        onDecodeModeChange(
+                            when (currentDecodeMode) {
+                                DecodeMode.HW -> DecodeMode.HWPlus
+                                DecodeMode.HWPlus -> DecodeMode.SW
+                                DecodeMode.SW -> DecodeMode.HW
+                            }
+                        )
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = when (currentDecodeMode) {
+                        DecodeMode.HW -> "HW"
+                        DecodeMode.HWPlus -> "HW+"
+                        DecodeMode.SW -> "SW"
+                    },
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(Modifier.width(12.dp))
             Box(
                 modifier = Modifier
                     .size(44.dp)
