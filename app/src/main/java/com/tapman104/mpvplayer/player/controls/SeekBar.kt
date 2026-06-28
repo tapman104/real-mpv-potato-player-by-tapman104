@@ -1,6 +1,7 @@
 package com.tapman104.mpvplayer.player.controls
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -34,7 +35,7 @@ fun PlayerSeekBar(
     ) {
         Text(
             text = formatMs(displayPositionMs),
-            color = Color.White.copy(alpha = 0.75f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
             fontSize = 12.sp,
             modifier = Modifier.widthIn(min = 48.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Start
@@ -53,16 +54,16 @@ fun PlayerSeekBar(
                 onDraggingChange(false)
             },
             colors = SliderDefaults.colors(
-                thumbColor = Color.White,
-                activeTrackColor = Color(0xFF8B5CF6),
-                inactiveTrackColor = Color.White.copy(alpha = 0.25f)
+                thumbColor = MaterialTheme.colorScheme.onPrimary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
             ),
             modifier = Modifier.weight(1f).height(20.dp)
         )
         Spacer(Modifier.width(8.dp))
         Text(
             text = formatMs(durationMs),
-            color = Color.White.copy(alpha = 0.75f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
             fontSize = 12.sp,
             modifier = Modifier.widthIn(min = 48.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.End

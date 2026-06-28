@@ -12,6 +12,7 @@ import androidx.compose.material.icons.rounded.ClosedCaption
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -139,14 +140,14 @@ fun PlayerTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Spacer(Modifier.width(8.dp))
             Text(
                 text = fileName,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
@@ -163,7 +164,7 @@ fun PlayerTopBar(
                 Icon(
                     imageVector = Icons.Rounded.Audiotrack,
                     contentDescription = "Audio track",
-                    tint = Color(0xFF8B5CF6),
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -174,7 +175,7 @@ fun PlayerTopBar(
                 Icon(
                     imageVector = Icons.Rounded.ClosedCaption,
                     contentDescription = "Subtitle track",
-                    tint = Color(0xFF8B5CF6),
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -187,7 +188,7 @@ fun PlayerTopBar(
                 Icon(
                     imageVector = Icons.Rounded.MoreVert,
                     contentDescription = "More options",
-                    tint = Color(0xFF8B5CF6),
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
             }
