@@ -122,17 +122,29 @@ class PlayerViewModel(
     fun setAspectRatio(mode: AspectRatioMode) {
         _playerState.update { it.copy(aspectRatio = mode) }
         when (mode) {
-            AspectRatioMode.DEFAULT, AspectRatioMode.FIT -> controller.executor.execute {
-                MPVLib.setPropertyString("video-aspect-override", "-1")
+            AspectRatioMode.DEFAULT -> controller.executor.execute {
+                MPVLib.setPropertyString("video-aspect-override", "no")
+                MPVLib.setPropertyString("video-aspect-mode", "container")
                 MPVLib.setPropertyDouble("panscan", 0.0)
+                MPVLib.setPropertyString("video-unscaled", "no")
+            }
+            AspectRatioMode.FIT -> controller.executor.execute {
+                MPVLib.setPropertyString("video-aspect-override", "no")
+                MPVLib.setPropertyString("video-aspect-mode", "container")
+                MPVLib.setPropertyDouble("panscan", 0.0)
+                MPVLib.setPropertyString("video-unscaled", "no")
             }
             AspectRatioMode.CROP -> controller.executor.execute {
-                MPVLib.setPropertyString("video-aspect-override", "-1")
+                MPVLib.setPropertyString("video-aspect-override", "no")
+                MPVLib.setPropertyString("video-aspect-mode", "container")
                 MPVLib.setPropertyDouble("panscan", 1.0)
+                MPVLib.setPropertyString("video-unscaled", "no")
             }
             AspectRatioMode.STRETCH -> controller.executor.execute {
-                // Approximate stretch or reset pan
+                MPVLib.setPropertyString("video-aspect-override", "no")
+                MPVLib.setPropertyString("video-aspect-mode", "none")
                 MPVLib.setPropertyDouble("panscan", 0.0)
+                MPVLib.setPropertyString("video-unscaled", "no")
             }
         }
     }
