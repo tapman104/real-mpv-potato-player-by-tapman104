@@ -46,5 +46,6 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation("com.google.android.material:material:1.12.0")
     kapt(libs.androidx.room.compiler)
 }
