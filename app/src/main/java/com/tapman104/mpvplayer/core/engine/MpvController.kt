@@ -34,6 +34,7 @@ class MpvController(private val context: Context) {
 
     fun init() {
         if (initialized) return
+        copyFontAsset()
         Log.d(TAG, "Initializing MPV engine")
         
         executor.execute {
@@ -63,7 +64,6 @@ class MpvController(private val context: Context) {
                 MPVLib.setOptionString("cache-pause-wait", "1")
                 
                 // Setup fonts
-                copyFontAsset()
                 MPVLib.setOptionString("sub-fonts-dir", "${context.filesDir.path}/fonts")
                 MPVLib.setOptionString("sub-font", "Roboto")
                 MPVLib.setOptionString("sub-font-provider", "none")
