@@ -22,6 +22,7 @@ import com.tapman104.mpvplayer.player.state.PlaylistState
 import com.tapman104.mpvplayer.player.controls.PlayerTopBar
 import com.tapman104.mpvplayer.player.controls.PlayerBottomBar
 import com.tapman104.mpvplayer.player.dialog.SubtitleAppearanceDialog
+import com.tapman104.mpvplayer.player.model.AspectRatioMode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -140,7 +141,13 @@ fun PlayerOverlay(
                 isPlaying = playerState.isPlaying,
                 onSeek = onSeek,
                 onTogglePlay = onTogglePlay,
-                onDraggingChange = { isDraggingSeekbar = it }
+                onDraggingChange = { isDraggingSeekbar = it },
+                currentAspectRatio = playerState.aspectRatio,
+                onAspectRatioCycle = {
+                    val modes = AspectRatioMode.entries
+                    val next = modes[(modes.indexOf(playerState.aspectRatio) + 1) % modes.size]
+                    onAspectRatioChange(next)
+                }
             )
         }
 

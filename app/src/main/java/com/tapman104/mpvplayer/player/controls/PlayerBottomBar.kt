@@ -2,12 +2,14 @@ package com.tapman104.mpvplayer.player.controls
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.tapman104.mpvplayer.player.model.AspectRatioMode
 
 @Composable
 fun PlayerBottomBar(
@@ -18,6 +20,8 @@ fun PlayerBottomBar(
     onSeek: (Long) -> Unit,
     onTogglePlay: () -> Unit,
     onDraggingChange: (Boolean) -> Unit = {},
+    currentAspectRatio: AspectRatioMode,
+    onAspectRatioCycle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -40,10 +44,17 @@ fun PlayerBottomBar(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(4.dp))
-        PlayPauseButton(
-            isPlaying = isPlaying,
-            onToggle = onTogglePlay,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            PlayPauseButton(
+                isPlaying = isPlaying,
+                onToggle = onTogglePlay,
+                modifier = Modifier.align(Alignment.Center)
+            )
+            AspectRatioCycleButton(
+                currentMode = currentAspectRatio,
+                onCycle = onAspectRatioCycle,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
     }
 }
