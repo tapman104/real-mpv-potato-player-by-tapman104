@@ -16,7 +16,7 @@ private fun formatMs(ms: Long): String {
 
 /**
  * Recognises a single-finger horizontal drag as a seek gesture.
- * Activation requires: |dx| > 30px AND |dx| > |dy|*2 AND held > 100ms AND not long-pressing.
+ * Activation requires: |dx| > 16px AND |dx| > |dy|*1.5 AND held > 50ms AND not long-pressing.
  * Cancels on multi-finger contact.
  */
 fun Modifier.horizontalSeekGesture(
@@ -44,6 +44,7 @@ fun Modifier.horizontalSeekGesture(
 
             var seekActive = false
             var initialPositionMs = currentPositionMsState.value
+            var lastReportedMs = -1L
 
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Main)
@@ -67,7 +68,7 @@ fun Modifier.horizontalSeekGesture(
 
                 if (!seekActive) {
                     // Activation condition — also blocked while a long-press is active
-                    if (abs(deltaX) > 30f && abs(deltaX) > abs(deltaY) * 2f && elapsed > 100 && !isLongPressing) {
+                    if (abs(deltaX) > 16f && abs(deltaX) > abs(deltaY) * 1.5f && elapsed > 50 && !isLongPressing) {
                         seekActive = true
                         initialPositionMs = currentPositionMsState.value
                         onSeekStart()
@@ -76,14 +77,17 @@ fun Modifier.horizontalSeekGesture(
 
                 if (seekActive) {
                     change.consume()
-                    val msPerPx = if (sensitivityPx > 0f) sensitivityPx else 300f
+                    val msPerPx = if (sensitivityPx > 0f) sensitivityPx else 80f
                     val dur = durationMsState.value
                     val targetMs = (initialPositionMs + (deltaX * msPerPx).toLong())
                         .coerceIn(0L, dur)
-                    onSeekTo(targetMs)
-                    val deltaMs = targetMs - initialPositionMs
-                    val sign = if (deltaMs >= 0) "+" else ""
-                    onSeekLabel(formatMs(targetMs), "$sign${formatMs(abs(deltaMs))}")
+                    if (abs(targetMs - lastReportedMs) >= 500L || lastReportedMs == -1L) {
+                        lastReportedMs = targetMs
+                        onSeekTo(targetMs)
+                        val deltaMs = targetMs - initialPositionMs
+                        val sign = if (deltaMs >= 0) "+" else ""
+                        onSeekLabel(formatMs(targetMs), "$sign${formatMs(abs(deltaMs))}")
+                    }
                 }
             }
         }
