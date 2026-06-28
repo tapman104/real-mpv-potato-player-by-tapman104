@@ -25,11 +25,11 @@ fun PlayerBottomBar(
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.85f))
+                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.4f), Color.Black.copy(alpha = 0.9f))
                 )
             )
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 12.dp)
+            .padding(horizontal = 24.dp, vertical = 24.dp)
     ) {
         PlayerSeekBar(
             currentPositionMs = currentPositionMs,
