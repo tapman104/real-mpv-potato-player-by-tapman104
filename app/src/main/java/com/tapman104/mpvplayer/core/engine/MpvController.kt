@@ -52,6 +52,16 @@ class MpvController(private val context: Context) {
                 MPVLib.setOptionString("hwdec", "mediacodec-copy")
                 MPVLib.setOptionString("keep-open", "yes")
                 
+                // Performance options
+                MPVLib.setOptionString("vd-lavc-threads", "0")
+                MPVLib.setOptionString("vd-lavc-dr", "yes")
+                MPVLib.setOptionString("video-sync", "audio")
+                MPVLib.setOptionString("interpolation", "no")
+                MPVLib.setOptionString("tls-verify", "no")
+                MPVLib.setOptionString("demuxer-max-bytes", "32MiB")
+                MPVLib.setOptionString("demuxer-max-back-bytes", "32MiB")
+                MPVLib.setOptionString("cache-pause-wait", "1")
+                
                 // Setup fonts
                 copyFontAsset()
                 MPVLib.setOptionString("sub-fonts-dir", "${context.filesDir.path}/fonts")

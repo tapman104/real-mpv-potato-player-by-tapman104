@@ -35,6 +35,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemGestures
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -230,11 +233,12 @@ fun GestureOverlay(
                     onPanChange = onPanChange,
                 )
         ) {
-            Row(modifier = Modifier.fillMaxSize()) {
+            Row(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemGestures)) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
+                        .padding(start = 20.dp)
                         .brightnessGesture(
                             activity = activity,
                             onBrightnessChange = {
@@ -252,6 +256,7 @@ fun GestureOverlay(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
+                        .padding(end = 20.dp)
                         .volumeGesture(
                             audioManager = audioManager,
                             onVolumeChange = {
