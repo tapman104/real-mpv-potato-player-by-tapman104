@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
                     val subtitleSize by settingsViewModel.subtitleSize.collectAsState()
                     val subtitlePosition by settingsViewModel.subtitlePosition.collectAsState()
                     val resumePlayback by settingsViewModel.resumePlayback.collectAsState()
+                    val decodeMode by settingsViewModel.decodeMode.collectAsState()
 
                     SettingsScreen(
                         preferredSubtitleLang = preferredSubtitleLang,
@@ -62,6 +63,8 @@ class MainActivity : ComponentActivity() {
                         onSubtitlePositionChange = { settingsViewModel.setSubtitlePosition(it) },
                         resumePlayback = resumePlayback,
                         onResumePlaybackChange = { settingsViewModel.setResumePlayback(it) },
+                        decodeMode = decodeMode,
+                        onDecodeModeChange = { settingsViewModel.setDecodeMode(it) },
                         onBack = { showSettings = false }
                     )
                 }

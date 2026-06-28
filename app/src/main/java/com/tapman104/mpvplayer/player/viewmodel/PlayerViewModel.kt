@@ -61,6 +61,7 @@ class PlayerViewModel(
     val subtitleSize = userPreferencesRepository.subtitleSize
     val subtitlePosition = userPreferencesRepository.subtitlePosition
     val resumePlayback = userPreferencesRepository.resumePlayback
+    val decodeModePreference = userPreferencesRepository.decodeMode
 
     init {
         controller.dispatcher.addListener(this)
@@ -424,6 +425,12 @@ class PlayerViewModel(
     fun setResumePlayback(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.setResumePlayback(enabled)
+        }
+    }
+
+    fun setDecodeModeStringPreference(mpvValue: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.setDecodeMode(mpvValue)
         }
     }
 

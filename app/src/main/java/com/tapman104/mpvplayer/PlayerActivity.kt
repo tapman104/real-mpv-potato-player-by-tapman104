@@ -166,6 +166,9 @@ class PlayerActivity : ComponentActivity() {
                     val resumePlayback by viewModel.resumePlayback.collectAsStateWithLifecycle(
                         initialValue = UserPreferencesRepository.DEFAULT_RESUME_PLAYBACK
                     )
+                    val decodeMode by viewModel.decodeModePreference.collectAsStateWithLifecycle(
+                        initialValue = UserPreferencesRepository.DEFAULT_DECODE_MODE
+                    )
                     SettingsScreen(
                         preferredSubtitleLang = preferredSubtitleLang,
                         onSubtitleLangChange = { viewModel.setPreferredSubtitleLanguage(it) },
@@ -175,6 +178,8 @@ class PlayerActivity : ComponentActivity() {
                         onSubtitlePositionChange = { viewModel.setSubtitlePosition(it) },
                         resumePlayback = resumePlayback,
                         onResumePlaybackChange = { viewModel.setResumePlayback(it) },
+                        decodeMode = decodeMode,
+                        onDecodeModeChange = { viewModel.setDecodeModeStringPreference(it) },
                         onBack = { showSettings = false }
                     )
                 }
