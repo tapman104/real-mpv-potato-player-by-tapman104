@@ -66,8 +66,8 @@ fun PlayerScreen(
         )
 
         GestureOverlay(
-            onSeekForward = { onSeekRelative(10_000L) },
-            onSeekBackward = { onSeekRelative(-10_000L) },
+            onSeekForward = { ms -> onSeekRelative(ms) },
+            onSeekBackward = { ms -> onSeekRelative(-ms) },
             onSpeedOverride = onSpeedOverride,
             onSpeedRestore = onSpeedRestore,
             onToggleControls = toggleControls,

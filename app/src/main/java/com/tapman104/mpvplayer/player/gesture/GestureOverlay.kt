@@ -78,8 +78,8 @@ enum class SeekDirection { Forward, Backward, None }
 
 @Composable
 fun GestureOverlay(
-    onSeekForward: () -> Unit,
-    onSeekBackward: () -> Unit,
+    onSeekForward: (Long) -> Unit,
+    onSeekBackward: (Long) -> Unit,
     onSpeedOverride: (Float) -> Unit,
     onSpeedRestore: () -> Unit,
     onToggleControls: () -> Unit,
@@ -100,6 +100,8 @@ fun GestureOverlay(
     var seekDirection by remember { mutableStateOf(SeekDirection.None) }
     var labelTrigger by remember { mutableIntStateOf(0) }
     var showSeekIndicator by remember { mutableStateOf(false) }
+    var tapCount by remember { mutableIntStateOf(0) }
+    var lastTapSide by remember { mutableStateOf("") } // "forward" or "backward"
 
     // ── Long-press 2× speed state ────────────────────────────────────────────
     var isLongPressing by remember { mutableStateOf(false) }
@@ -143,6 +145,8 @@ fun GestureOverlay(
             delay(300) // wait for fade-out before clearing text
             seekLabel = ""
             seekDirection = SeekDirection.None
+            tapCount = 0
+            lastTapSide = ""
         }
     }
 
@@ -184,15 +188,35 @@ fun GestureOverlay(
                 .fillMaxSize()
                 .tapGesture(
                     onToggleControls = onToggleControls,
-                    onSeekForward = onSeekForward,
-                    onSeekBackward = onSeekBackward,
-                    onSpeedOverride = onSpeedOverride,
-                    onSpeedRestore = onSpeedRestore,
-                    onSeekLabel = { label ->
-                        seekLabel = label
-                        seekDirection = if (label.startsWith("+")) SeekDirection.Forward else SeekDirection.Backward
+                    onSeekForward = {
+                        if (lastTapSide != "forward") { tapCount = 0; lastTapSide = "forward" }
+                        tapCount++
+                        val seekMs = when {
+                            tapCount >= 3 -> 30_000L
+                            tapCount == 2 -> 20_000L
+                            else          -> 10_000L
+                        }
+                        onSeekForward(seekMs)
+                        seekLabel = "+${seekMs / 1000}s"
+                        seekDirection = SeekDirection.Forward
                         labelTrigger++
                     },
+                    onSeekBackward = {
+                        if (lastTapSide != "backward") { tapCount = 0; lastTapSide = "backward" }
+                        tapCount++
+                        val seekMs = when {
+                            tapCount >= 3 -> 30_000L
+                            tapCount == 2 -> 20_000L
+                            else          -> 10_000L
+                        }
+                        onSeekBackward(seekMs)
+                        seekLabel = "-${seekMs / 1000}s"
+                        seekDirection = SeekDirection.Backward
+                        labelTrigger++
+                    },
+                    onSpeedOverride = onSpeedOverride,
+                    onSpeedRestore = onSpeedRestore,
+                    onSeekLabel = { /* label now set directly in onSeekForward/onSeekBackward above */ },
                     onLongPressStart = { isLongPressing = true },
                     onLongPressEnd = { isLongPressing = false }
                 )

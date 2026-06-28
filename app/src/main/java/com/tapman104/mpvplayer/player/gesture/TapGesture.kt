@@ -123,10 +123,8 @@ fun Modifier.tapGesture(
                         secondUp.consume()
                         if (secondUp.position.x < size.width / 2) {
                             currentOnSeekBackward()
-                            currentOnSeekLabel("-10s")
                         } else {
                             currentOnSeekForward()
-                            currentOnSeekLabel("+10s")
                         }
                     } else {
                         currentOnLongPressStart()
