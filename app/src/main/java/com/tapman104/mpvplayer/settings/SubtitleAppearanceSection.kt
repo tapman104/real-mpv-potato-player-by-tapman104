@@ -1,7 +1,11 @@
 package com.tapman104.mpvplayer.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -9,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -18,8 +23,37 @@ fun SubtitleAppearanceSection(
     subtitlePosition: Float,
     onSizeChange: (Float) -> Unit,
     onPositionChange: (Float) -> Unit,
+    onBack: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF111111))
+    ) {
+        // Top bar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Subtitle Appearance",
+                color = Color.White,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
 
         // --- Subtitle Size row ---
         Column(
@@ -53,8 +87,6 @@ fun SubtitleAppearanceSection(
             )
         }
 
-        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
-
         // --- Subtitle Position row ---
         Column(
             modifier = Modifier
@@ -86,7 +118,5 @@ fun SubtitleAppearanceSection(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-
-        HorizontalDivider(color = Color.White.copy(alpha = 0.06f), thickness = 0.5.dp)
     }
 }

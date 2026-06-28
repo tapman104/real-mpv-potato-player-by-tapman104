@@ -24,6 +24,9 @@ class SettingsViewModel(
     val resumePlayback = userPreferencesRepository.resumePlayback
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserPreferencesRepository.DEFAULT_RESUME_PLAYBACK)
 
+    val decodeMode = userPreferencesRepository.decodeMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserPreferencesRepository.DEFAULT_DECODE_MODE)
+
     fun setSubtitleLanguage(lang: String) {
         viewModelScope.launch {
             userPreferencesRepository.setSubtitleLanguage(lang)
@@ -45,6 +48,12 @@ class SettingsViewModel(
     fun setResumePlayback(enabled: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.setResumePlayback(enabled)
+        }
+    }
+
+    fun setDecodeMode(mpvValue: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.setDecodeMode(mpvValue)
         }
     }
 }
